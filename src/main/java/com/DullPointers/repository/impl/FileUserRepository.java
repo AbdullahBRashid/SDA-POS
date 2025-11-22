@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class FileUserRepository implements UserRepository {
+    // Change in .gitignore too if file name or path changes.
     private static final String FILE_PATH = "users.json";
     private List<User> database;
 

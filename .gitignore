@@ -53,3 +53,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Database Files ###
+sales.json
+users.json
+products.json

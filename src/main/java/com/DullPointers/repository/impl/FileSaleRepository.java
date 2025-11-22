@@ -6,6 +6,7 @@ import com.DullPointers.util.JsonDataStore;
 import java.util.List;
 
 public class FileSaleRepository implements SaleRepository {
+    // Change in .gitignore too if file name or path changes.
     private static final String FILE_PATH = "sales.json";
     private List<Sale> database;
 
