@@ -6,6 +6,7 @@ import com.DullPointers.repository.UserRepository;
 import com.DullPointers.util.JsonDataStore;
 import com.DullPointers.util.PasswordUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +22,6 @@ public class FileUserRepository implements UserRepository {
         // 2. SEEDING: If no users exist (first run), create default accounts
         if (database.isEmpty()) {
             System.out.println("First run detected: Creating default users...");
-
 
             // Add Admin
             database.add(new User("admin", PasswordUtil.hash("1234"), Role.ADMIN));
@@ -41,11 +41,23 @@ public class FileUserRepository implements UserRepository {
         JsonDataStore.save(database, FILE_PATH);
     }
 
-    // Used when you build the "User Management" screen later (Req 13)
+    @Override
+    public List<User> findAll() {
+        // Return a copy of the list to prevent external modification of the cache directly
+        return new ArrayList<>(database);
+    }
+
+    @Override
     public void save(User user) {
         // Remove existing user with same username to handle updates
         database.removeIf(u -> u.getUsername().equals(user.getUsername()));
         database.add(user);
+        saveToFile();
+    }
+
+    @Override
+    public void delete(User user) {
+        database.removeIf(u -> u.getUsername().equals(user.getUsername()));
         saveToFile();
     }
 

@@ -5,6 +5,7 @@ import com.DullPointers.repository.ProductRepository;
 import com.DullPointers.util.JsonDataStore;
 
 import java.math.BigDecimal;
+import java.util.ArrayList; // <--- Added this import
 import java.util.List;
 import java.util.Optional;
 
@@ -44,5 +45,12 @@ public class FileProductRepository implements ProductRepository {
 
         // Commit to file immediately
         saveToFile();
+    }
+
+    // --- NEW METHOD ---
+    @Override
+    public List<Product> findAll() {
+        // Return a copy to protect the internal list
+        return new ArrayList<>(database);
     }
 }

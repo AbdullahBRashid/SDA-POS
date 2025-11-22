@@ -6,6 +6,7 @@ module com.DullPointers {
 
     requires jbcrypt;
 
+    opens com.DullPointers.controller to javafx.fxml;
     opens com.DullPointers.model to com.fasterxml.jackson.databind;
     opens com.DullPointers.model.enums to com.fasterxml.jackson.databind;
 
