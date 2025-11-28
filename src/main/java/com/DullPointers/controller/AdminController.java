@@ -3,7 +3,8 @@ package com.DullPointers.controller;
 import com.DullPointers.model.User;
 import com.DullPointers.model.enums.Role;
 import com.DullPointers.repository.UserRepository;
-// import com.DullPointers.util.PasswordUtil; // Uncomment if you have this
+// import com.DullPointers.util.PasswordUtil;
+import com.DullPointers.util.PasswordUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -53,16 +54,8 @@ public class AdminController {
 
     private void loadUsers() {
         if (userRepository == null) return;
-        // Note: Your UserRepository interface needs a findAll() method.
-        // If it doesn't exist, you'll need to add it.
-        // For now, assuming it returns a List<User>.
         try {
-            // If your repo doesn't support findAll, we might need to mock it or add it.
-            // userTable.setItems(FXCollections.observableArrayList(userRepository.findAll()));
-
-            // Since I don't see findAll() in your previous snippets, I will leave this commented
-            // and assume you will add `List<User> findAll();` to your UserRepository interface.
-            System.out.println("Loading users...");
+            userTable.setItems(FXCollections.observableArrayList(userRepository.findAll()));
         } catch (Exception e) {
             statusLabel.setText("Error loading users: " + e.getMessage());
         }
@@ -83,9 +76,8 @@ public class AdminController {
         }
 
         try {
-            // 1. Hash the password (MOCK logic here, use BCrypt in real app)
-            // String passwordHash = PasswordUtil.hash(password);
-            String passwordHash = password; // Temporary bypass
+            // 1. Hash the password
+            String passwordHash  = PasswordUtil.hash(password);
 
             // 2. Create User Model
             User newUser = new User(username, passwordHash, role);
@@ -119,7 +111,7 @@ public class AdminController {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            // userRepository.delete(selectedUser); // Assume delete method exists
+            userRepository.delete(selectedUser);
             userTable.getItems().remove(selectedUser);
             statusLabel.setText("User deleted.");
         }
@@ -127,7 +119,9 @@ public class AdminController {
 
     @FXML
     private void handleLogout() {
-        if (logoutHandler != null) logoutHandler.run();
+        if (logoutHandler != null) {
+            logoutHandler.run();
+        }
     }
 
     private void clearForm() {

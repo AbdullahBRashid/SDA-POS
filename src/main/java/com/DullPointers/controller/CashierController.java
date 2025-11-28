@@ -5,6 +5,8 @@ import com.DullPointers.manager.SaleManager;
 import com.DullPointers.model.Sale;
 import com.DullPointers.model.SaleLineItem;
 import com.DullPointers.model.enums.PaymentMethod;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.converter.IntegerStringConverter;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -19,9 +21,11 @@ import java.util.Optional;
 
 public class CashierController {
 
+
     // --- UI Components ---
     @FXML private Label currentUserLabel;
     @FXML private TableView<SaleLineItem> cartTable;
+    @FXML private TableColumn<SaleLineItem, Void> colDelete;
     @FXML private TableColumn<SaleLineItem, String> colProduct;
     @FXML private TableColumn<SaleLineItem, BigDecimal> colPrice;
     @FXML private TableColumn<SaleLineItem, Integer> colQty;
@@ -41,13 +45,63 @@ public class CashierController {
     // --- Initialization ---
     @FXML
     public void initialize() {
-        // Set up Table Columns to read from the Model
+        // 1. Enable Editing on the Table
+        cartTable.setEditable(true);
+
+        // --- Column Setup ---
         colProduct.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getProduct().getName()));
         colPrice.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getSnapshotPrice()));
-        colQty.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getQuantity()));
         colTotal.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getSubTotal()));
 
-        // Ensure text field grabs focus on enter
+        // --- QUANTITY COLUMN (EDITABLE) ---
+        // A. Bind the data
+        colQty.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getQuantity()));
+
+        // B. Make the cell an editable Text Field that accepts Integers
+        colQty.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+
+        // C. Handle the "Enter Key" event (Commit)
+        colQty.setOnEditCommit(event -> {
+            SaleLineItem item = event.getRowValue();
+            Integer newQty = event.getNewValue();
+
+            // Validation: Quantity must be positive
+            if (newQty != null && newQty > 0) {
+                // Update Model
+                item.setQuantity(newQty);
+
+                // Recalculate Totals & Refresh UI
+                // We call updateUI() to ensure the 'Total' column and 'Grand Total' labels update immediately
+                updateUI();
+                messageLabel.setText("Updated qty for " + item.getProduct().getName());
+                messageLabel.setStyle("-fx-text-fill: green;");
+            } else {
+                // Invalid input: Refresh to revert the visual change in the table
+                messageLabel.setText("Quantity must be greater than 0");
+                messageLabel.setStyle("-fx-text-fill: red;");
+                cartTable.refresh();
+            }
+        });
+
+        // --- DELETE BUTTON COLUMN (From previous step) ---
+        colDelete.setCellFactory(param -> new TableCell<>() {
+            private final Button deleteBtn = new Button("X");
+            {
+                deleteBtn.getStyleClass().add("table-delete-btn"); // Ensure this class exists in CSS
+                deleteBtn.setOnAction(event -> {
+                    SaleLineItem item = getTableView().getItems().get(getIndex());
+                    handleDeleteItem(item);
+                });
+            }
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) setGraphic(null);
+                else setGraphic(deleteBtn);
+            }
+        });
+
+        // Ensure text field grabs focus on enter for barcode scanning
         barcodeField.setOnKeyPressed((KeyEvent event) -> {
             if (event.getCode() == KeyCode.ENTER) {
                 handleAddItem();
@@ -87,6 +141,18 @@ public class CashierController {
             messageLabel.setText("Error: " + e.getMessage());
             messageLabel.setStyle("-fx-text-fill: red;");
         }
+        barcodeField.requestFocus();
+    }
+
+    @FXML
+    private void handleDeleteItem(SaleLineItem item) {
+        // 1. Call Manager to remove logic
+        saleManager.removeItemFromSale(item);
+
+        // 2. Refresh UI
+        updateUI();
+
+        // Optional: Reset focus to barcode field for speed
         barcodeField.requestFocus();
     }
 
@@ -154,6 +220,7 @@ public class CashierController {
         if (currentSale != null) {
             ObservableList<SaleLineItem> items = FXCollections.observableArrayList(currentSale.getItems());
             cartTable.setItems(items);
+            cartTable.refresh();
 
             // 2. Refresh Totals
             BigDecimal total = currentSale.calculateGrandTotal();

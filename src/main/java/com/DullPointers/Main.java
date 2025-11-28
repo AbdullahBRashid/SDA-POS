@@ -9,10 +9,12 @@ import com.DullPointers.manager.InventoryManager;
 import com.DullPointers.manager.SaleManager;
 import com.DullPointers.repository.ProductRepository;
 import com.DullPointers.repository.SaleRepository;
+import com.DullPointers.repository.ShiftRepository;
 import com.DullPointers.repository.UserRepository;
 import com.DullPointers.repository.impl.FileProductRepository;
 import com.DullPointers.repository.impl.FileSaleRepository;
 import com.DullPointers.repository.impl.FileUserRepository;
+import com.DullPointers.repository.impl.FileShiftRepository;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,6 +29,7 @@ public class Main extends Application {
 
     // Repositories (Data Layer)
     private UserRepository userRepo;
+    private ShiftRepository shiftRepo;
     private ProductRepository productRepo;
     private SaleRepository saleRepo;
 
@@ -41,10 +44,11 @@ public class Main extends Application {
         // These load from JSON files immediately
         this.userRepo = new FileUserRepository();
         this.productRepo = new FileProductRepository();
+        this.shiftRepo = new FileShiftRepository();
         this.saleRepo = new FileSaleRepository();
 
         // 2. Initialize Managers with Dependency Injection
-        this.authManager = new AuthManager(userRepo);
+        this.authManager = new AuthManager(userRepo, shiftRepo);
         this.inventoryManager = new InventoryManager(productRepo);
         this.saleManager = new SaleManager(saleRepo, productRepo, inventoryManager, authManager);
     }

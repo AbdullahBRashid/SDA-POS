@@ -3,6 +3,7 @@ package com.DullPointers.manager;
 import com.DullPointers.model.Payment;
 import com.DullPointers.model.Product;
 import com.DullPointers.model.Sale;
+import com.DullPointers.model.SaleLineItem;
 import com.DullPointers.model.enums.PaymentMethod;
 import com.DullPointers.model.enums.SaleStatus;
 import com.DullPointers.repository.ProductRepository;
@@ -47,7 +48,18 @@ public class SaleManager {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         // 3. Add to Sale
+        for (SaleLineItem item : currentSale.getItems()) {
+            if (item.getProduct().getBarcode().equals(barcode)) {
+                item.incrementQuantity();
+                return;
+            }
+        }
+
         currentSale.addItem(product, quantity);
+    }
+
+    public void removeItemFromSale(SaleLineItem item) {
+        currentSale.getItems().removeIf(it -> it.equals(item));
     }
 
     // Req 7: Add Payment (Split payment logic)

@@ -31,6 +31,7 @@
             <padding><Insets bottom="20" left="20" right="10" top="20"/></padding>
             <TableView fx:id="cartTable" VBox.vgrow="ALWAYS">
                 <columns>
+                    <TableColumn fx:id="colDelete" text="Action" prefWidth="60" style="-fx-alignment: CENTER;"/>
                     <TableColumn fx:id="colProduct" text="Product Name" prefWidth="250"/>
                     <TableColumn fx:id="colPrice" text="Price" prefWidth="100"/>
                     <TableColumn fx:id="colQty" text="Qty" prefWidth="50"/>

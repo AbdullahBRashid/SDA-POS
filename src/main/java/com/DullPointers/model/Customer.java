@@ -14,7 +14,6 @@ public class Customer {
     public void addLoyaltyPoints(int points) {
         this.loyaltyPoints += points;
     }
-
     public String getPhoneNumber() { return phoneNumber; }
     public String getName() { return name; }
     public int getLoyaltyPoints() { return loyaltyPoints; }

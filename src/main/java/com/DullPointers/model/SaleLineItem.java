@@ -25,6 +25,11 @@ public class SaleLineItem {
         this.quantity = quantity;
     }
 
+    // Logic: Increment quantity
+    public void incrementQuantity() {
+        this.quantity++;
+    }
+
     public Product getProduct() { return product; }
     public int getQuantity() { return quantity; }
     public BigDecimal getSnapshotPrice() { return snapshotPrice; }
