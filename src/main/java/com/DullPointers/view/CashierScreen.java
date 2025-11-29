@@ -19,7 +19,7 @@ public class CashierScreen {
     }
 
     public Parent getView() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("//view/CashierView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CashierView.fxml"));
         Parent root = loader.load();
 
         CashierController controller = loader.getController();

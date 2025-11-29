@@ -16,7 +16,7 @@ public class LoginScreen {
     }
 
     public Parent getView() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("//view/LoginView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginView.fxml"));
         Parent root = loader.load();
 
         LoginController controller = loader.getController();

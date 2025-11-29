@@ -41,6 +41,7 @@ public class Product {
     public String getName() { return name; }
     public BigDecimal getSellingPrice() { return sellingPrice; }
     public int getStockQuantity() { return stockQuantity; }
+    public String getIdk() {return "Hello World";}
     public void setStockQuantity(int stockQuantity) { this.stockQuantity = stockQuantity; }
     public void setMinStockLevel(int minStockLevel) { this.minStockLevel = minStockLevel; }
 }

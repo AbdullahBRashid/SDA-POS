@@ -19,7 +19,7 @@ public class AdminScreen {
     }
 
     public Parent getView() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("//view/AdminView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/AdminView.fxml"));
         Parent root = loader.load();
 
         AdminController controller = loader.getController();

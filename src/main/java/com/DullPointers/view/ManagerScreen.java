@@ -19,7 +19,7 @@ public class ManagerScreen {
     }
 
     public Parent getView() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("//view/ManagerView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ManagerView.fxml"));
         Parent root = loader.load();
 
         ManagerController controller = loader.getController();
