@@ -10,6 +10,8 @@ public class Payment {
     private LocalDateTime timestamp;
     private String referenceId; // E.g., "VISA-1234"
 
+    public Payment() {}
+
     public Payment(BigDecimal amount, PaymentMethod method, String referenceId) {
         this.amount = amount;
         this.method = method;

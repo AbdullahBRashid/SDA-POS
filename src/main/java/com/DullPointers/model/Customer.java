@@ -5,6 +5,8 @@ public class Customer {
     private String name;
     private int loyaltyPoints; // Req 19
 
+    public Customer() {}
+
     public Customer(String phoneNumber, String name) {
         this.phoneNumber = phoneNumber;
         this.name = name;

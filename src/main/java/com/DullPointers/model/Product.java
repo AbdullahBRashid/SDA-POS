@@ -11,6 +11,8 @@ public class Product {
     private int stockQuantity;
     private int minStockLevel;
 
+    public Product() {}
+
     public Product(String barcode, String name, BigDecimal sellingPrice, int stockQuantity) {
         this.barcode = barcode;
         this.name = name;

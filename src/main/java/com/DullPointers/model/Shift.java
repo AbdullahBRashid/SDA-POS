@@ -10,6 +10,8 @@ public class Shift {
     private ZonedDateTime startTime;
     private ZonedDateTime endTime;
 
+    public Shift() {}
+
     public Shift(String username, ZonedDateTime startTime) {
         this.id = ++curr_id;
         this.username = username;

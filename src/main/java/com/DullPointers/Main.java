@@ -1,37 +1,43 @@
 package com.DullPointers;
 
-import com.DullPointers.controller.AdminController;
-import com.DullPointers.controller.CashierController;
-import com.DullPointers.controller.LoginController;
-import com.DullPointers.controller.ManagerController;
 import com.DullPointers.manager.AuthManager;
 import com.DullPointers.manager.InventoryManager;
 import com.DullPointers.manager.SaleManager;
+
+// Interfaces
 import com.DullPointers.repository.ProductRepository;
 import com.DullPointers.repository.SaleRepository;
 import com.DullPointers.repository.ShiftRepository;
 import com.DullPointers.repository.UserRepository;
+
+// Implementations (The File-based databases)
 import com.DullPointers.repository.impl.FileProductRepository;
 import com.DullPointers.repository.impl.FileSaleRepository;
-import com.DullPointers.repository.impl.FileUserRepository;
 import com.DullPointers.repository.impl.FileShiftRepository;
+import com.DullPointers.repository.impl.FileUserRepository;
+
+// View Classes (The separate screen loaders you created)
+import com.DullPointers.view.AdminScreen;
+import com.DullPointers.view.CashierScreen;
+import com.DullPointers.view.LoginScreen;
+import com.DullPointers.view.ManagerScreen;
+import com.DullPointers.view.ViewNavigator;
+
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class Main extends Application {
+public class Main extends Application implements ViewNavigator {
 
     private Stage primaryStage;
 
     // Repositories (Data Layer)
     private UserRepository userRepo;
-    private ShiftRepository shiftRepo;
     private ProductRepository productRepo;
     private SaleRepository saleRepo;
+    private ShiftRepository shiftRepo;
 
     // Managers (Business Logic Layer)
     private AuthManager authManager;
@@ -40,16 +46,18 @@ public class Main extends Application {
 
     @Override
     public void init() {
-        // 1. Initialize Repositories
-        // These load from JSON files immediately
+        // 1. Initialize Repositories (Load from JSON files)
         this.userRepo = new FileUserRepository();
         this.productRepo = new FileProductRepository();
-        this.shiftRepo = new FileShiftRepository();
         this.saleRepo = new FileSaleRepository();
+        this.shiftRepo = new FileShiftRepository();
 
-        // 2. Initialize Managers with Dependency Injection
+        // 2. Initialize Managers (Dependency Injection)
+        // AuthManager needs ShiftRepo to track user shifts
         this.authManager = new AuthManager(userRepo, shiftRepo);
         this.inventoryManager = new InventoryManager(productRepo);
+
+        // SaleManager needs access to sales, products, inventory checks, and the current user
         this.saleManager = new SaleManager(saleRepo, productRepo, inventoryManager, authManager);
     }
 
@@ -58,95 +66,55 @@ public class Main extends Application {
         this.primaryStage = stage;
         this.primaryStage.setTitle("Java POS System");
 
-        // Start with the Login Screen
-        showLoginScreen();
+        // Start the app at the Login Screen
+        showLogin();
 
         this.primaryStage.show();
     }
 
-    // --- NAVIGATION METHODS ---
+    // --- VIEW NAVIGATOR IMPLEMENTATION ---
+    // These methods allow your screens to switch views without knowing the details
 
-    public void showLoginScreen() {
+    @Override
+    public void showLogin() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginView.fxml"));
-            Parent root = loader.load();
-
-            LoginController controller = loader.getController();
-
-            // Inject dependencies
-            controller.setAuthManager(authManager);
-
-            // Define Navigation Logic (Router)
-            controller.setNavigator(new LoginController.ViewNavigator() {
-                @Override
-                public void navigateToCashierView() { showCashierScreen(); }
-
-                @Override
-                public void navigateToAdminView() { showAdminScreen(); }
-
-                @Override
-                public void navigateToManagerView() { showManagerScreen(); }
-            });
-
-            primaryStage.setScene(new Scene(root));
+            LoginScreen screen = new LoginScreen(authManager, this);
+            primaryStage.setScene(new Scene(screen.getView()));
             primaryStage.centerOnScreen();
-
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Failed to load LoginView: " + e.getMessage());
+            System.err.println("Critical Error: Could not load Login View.");
         }
     }
 
-    public void showCashierScreen() {
+    @Override
+    public void showCashier() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CashierView.fxml"));
-            Parent root = loader.load();
-
-            CashierController controller = loader.getController();
-            controller.setManagers(saleManager, authManager);
-
-            // Handle Logout: Go back to Login
-            controller.setLogoutHandler(this::showLoginScreen);
-
-            primaryStage.setScene(new Scene(root));
+            CashierScreen screen = new CashierScreen(saleManager, authManager, this);
+            primaryStage.setScene(new Scene(screen.getView()));
             primaryStage.centerOnScreen();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void showAdminScreen() {
+    @Override
+    public void showAdmin() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/AdminView.fxml"));
-            Parent root = loader.load();
-
-            AdminController controller = loader.getController();
-
-            // Inject UserRepo for user management
-            controller.setDependencies(userRepo, this::showLoginScreen);
-
-            primaryStage.setScene(new Scene(root));
+            AdminScreen screen = new AdminScreen(userRepo, authManager, this);
+            primaryStage.setScene(new Scene(screen.getView()));
             primaryStage.centerOnScreen();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void showManagerScreen() {
+    @Override
+    public void showManager() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ManagerView.fxml"));
-            Parent root = loader.load();
-
-            ManagerController controller = loader.getController();
-
-            // Inject ProductRepo for inventory management
-            controller.setDependencies(productRepo, this::showLoginScreen);
-
-            primaryStage.setScene(new Scene(root));
+            ManagerScreen screen = new ManagerScreen(productRepo, authManager, this);
+            primaryStage.setScene(new Scene(screen.getView()));
             primaryStage.centerOnScreen();
-
         } catch (IOException e) {
             e.printStackTrace();
         }

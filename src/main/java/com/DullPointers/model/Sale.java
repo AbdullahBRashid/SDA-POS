@@ -15,6 +15,8 @@ public class Sale {
     private List<SaleLineItem> items;
     private List<Payment> payments; // (Req 7 - Split payments)
 
+    public Sale() {}
+
     public Sale(User cashier) {
         this.saleDate = LocalDateTime.now();
         this.status = SaleStatus.PENDING;

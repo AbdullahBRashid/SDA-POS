@@ -8,6 +8,8 @@ public class User {
     private String fullName;
     private Role role; // Req 13
 
+    public User() {}
+
     public User(String username, String passwordHash, Role role) {
         this.username = username;
         this.passwordHash = passwordHash;

@@ -7,6 +7,8 @@ public class SaleLineItem {
     private int quantity;
     private BigDecimal snapshotPrice; // The price AT THE MOMENT of sale
 
+    public SaleLineItem() {}
+
     public SaleLineItem(Product product, int quantity) {
         this.product = product;
         this.quantity = quantity;
