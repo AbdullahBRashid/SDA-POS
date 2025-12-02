@@ -2,6 +2,7 @@ package com.DullPointers.view;
 
 import com.DullPointers.controller.ManagerController;
 import com.DullPointers.manager.AuthManager;
+import com.DullPointers.manager.NotificationManager;
 import com.DullPointers.repository.ProductRepository;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,11 +11,13 @@ import java.io.IOException;
 public class ManagerScreen {
     private final ProductRepository productRepository;
     private final AuthManager authManager;
+    private final NotificationManager notificationManager;
     private final ViewNavigator navigator;
 
-    public ManagerScreen(ProductRepository productRepository, AuthManager authManager, ViewNavigator navigator) {
+    public ManagerScreen(ProductRepository productRepository, NotificationManager notificationManager, AuthManager authManager, ViewNavigator navigator) {
         this.productRepository = productRepository;
         this.authManager = authManager;
+        this.notificationManager = notificationManager;
         this.navigator = navigator;
     }
 
@@ -30,7 +33,7 @@ public class ManagerScreen {
             navigator.showLogin();
         };
 
-        controller.setDependencies(productRepository, logoutAction);
+        controller.setDependencies(productRepository, notificationManager, logoutAction);
 
         return root;
     }

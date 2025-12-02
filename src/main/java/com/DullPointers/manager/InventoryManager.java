@@ -6,33 +6,29 @@ import java.util.Optional;
 
 public class InventoryManager {
     private final ProductRepository productRepository;
+    private final NotificationManager notificationManager;
 
-    // Constructor Injection (DIP compliant)
-    public InventoryManager(ProductRepository productRepository) {
+    public InventoryManager(ProductRepository productRepository, NotificationManager notificationManager) {
         this.productRepository = productRepository;
+        this.notificationManager = notificationManager;
     }
 
-    // Logic for Req 10: Restrict sale of out-of-stock items
     public boolean checkStock(String barcode, int quantityRequested) {
         Optional<Product> productOpt = productRepository.findByBarcode(barcode);
-
-        if (productOpt.isEmpty()) return false;
-
-        return productOpt.get().hasSufficientStock(quantityRequested);
+        return productOpt.isPresent() && productOpt.get().getStockQuantity() >= quantityRequested;
     }
 
-    // Logic for Req 9: Update stock levels
     public void reduceStock(String barcode, int quantity) {
         Product product = productRepository.findByBarcode(barcode)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         product.reduceStock(quantity);
-        productRepository.save(product); // Save new quantity to DB
+        productRepository.save(product);
 
-        // Logic for Req 11: Notify when low
-        if (product.isLowStock()) {
-            System.out.println("WARNING: Low Stock for " + product.getName());
-            // In a real app, this would trigger a UI Alert or Email
+        // Warning Logic
+        if (product.getStockQuantity() <= 5) {
+            String msg = "Low Stock: " + product.getName() + " (Qty: " + product.getStockQuantity() + ")";
+            notificationManager.addAlert(msg);
         }
     }
 }

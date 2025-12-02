@@ -1,107 +1,76 @@
 package com.DullPointers;
 
-import com.DullPointers.manager.AuthManager;
-import com.DullPointers.manager.InventoryManager;
-import com.DullPointers.manager.SaleManager;
-
-// Interfaces
-import com.DullPointers.repository.ProductRepository;
-import com.DullPointers.repository.SaleRepository;
-import com.DullPointers.repository.ShiftRepository;
-import com.DullPointers.repository.UserRepository;
-
-// Implementations (The File-based databases)
-import com.DullPointers.repository.impl.FileProductRepository;
-import com.DullPointers.repository.impl.FileSaleRepository;
-import com.DullPointers.repository.impl.FileShiftRepository;
-import com.DullPointers.repository.impl.FileUserRepository;
-
-// View Classes (The separate screen loaders you created)
-import com.DullPointers.view.AdminScreen;
-import com.DullPointers.view.CashierScreen;
-import com.DullPointers.view.LoginScreen;
-import com.DullPointers.view.ManagerScreen;
-import com.DullPointers.view.ViewNavigator;
-
+import com.DullPointers.manager.*;
+import com.DullPointers.repository.*;
+import com.DullPointers.repository.impl.*;
+import com.DullPointers.view.*;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
 public class Main extends Application implements ViewNavigator {
-
     private Stage primaryStage;
 
-    // Repositories (Data Layer)
+    // Core Dependencies
     private UserRepository userRepo;
     private ProductRepository productRepo;
     private SaleRepository saleRepo;
     private ShiftRepository shiftRepo;
+    private CustomerRepository customerRepo;
 
-    // Managers (Business Logic Layer)
     private AuthManager authManager;
     private InventoryManager inventoryManager;
     private SaleManager saleManager;
+    private NotificationManager notificationManager;
 
     @Override
     public void init() {
-        // 1. Initialize Repositories (Load from JSON files)
+        // 1. Data Layer
         this.userRepo = new FileUserRepository();
         this.productRepo = new FileProductRepository();
         this.saleRepo = new FileSaleRepository();
         this.shiftRepo = new FileShiftRepository();
+        this.customerRepo = new FileCustomerRepository();
 
-        // 2. Initialize Managers (Dependency Injection)
-        // AuthManager needs ShiftRepo to track user shifts
+        // 2. Business Layer
+        this.notificationManager = new NotificationManager();
+        this.inventoryManager = new InventoryManager(productRepo, notificationManager);
         this.authManager = new AuthManager(userRepo, shiftRepo);
-        this.inventoryManager = new InventoryManager(productRepo);
-
-        // SaleManager needs access to sales, products, inventory checks, and the current user
-        this.saleManager = new SaleManager(saleRepo, productRepo, inventoryManager, authManager);
+        this.saleManager = new SaleManager(saleRepo, productRepo, inventoryManager, authManager, customerRepo);
     }
 
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
-        this.primaryStage.setTitle("Java POS System");
-
-        // Start the app at the Login Screen
         showLogin();
-
-        this.primaryStage.show();
+        stage.show();
     }
 
-    // --- VIEW NAVIGATOR IMPLEMENTATION ---
-    // These methods allow your screens to switch views without knowing the details
-
+    // --- NAVIGATION ---
     @Override
     public void showLogin() {
         try {
-            LoginScreen screen = new LoginScreen(authManager, this);
-            primaryStage.setScene(new Scene(screen.getView()));
-            primaryStage.centerOnScreen();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Critical Error: Could not load Login View.");
-        }
+            LoginScreen s = new LoginScreen(authManager, this);
+            primaryStage.setScene(new Scene(s.getView()));
+        } catch(Exception e) { e.printStackTrace(); }
     }
 
     @Override
     public void showCashier() {
         try {
-            CashierScreen screen = new CashierScreen(saleManager, authManager, this);
-            primaryStage.setScene(new Scene(screen.getView()));
-            primaryStage.centerOnScreen();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+            // Updated to pass the repositories
+            CashierScreen screen = new CashierScreen(
+                    saleManager,
+                    authManager,
+                    customerRepo,
+                    saleRepo,
+                    this
+            );
 
-    @Override
-    public void showAdmin() {
-        try {
-            AdminScreen screen = new AdminScreen(userRepo, authManager, this);
             primaryStage.setScene(new Scene(screen.getView()));
             primaryStage.centerOnScreen();
         } catch (IOException e) {
@@ -112,15 +81,23 @@ public class Main extends Application implements ViewNavigator {
     @Override
     public void showManager() {
         try {
-            ManagerScreen screen = new ManagerScreen(productRepo, authManager, this);
-            primaryStage.setScene(new Scene(screen.getView()));
-            primaryStage.centerOnScreen();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ManagerView.fxml"));
+            Parent root = loader.load();
+            com.DullPointers.controller.ManagerController c = loader.getController();
+
+            c.setDependencies(productRepo, notificationManager, () -> { authManager.logout(); showLogin(); });
+
+            primaryStage.setScene(new Scene(root));
+        } catch(Exception e) { e.printStackTrace(); }
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    @Override
+    public void showAdmin() {
+        try {
+            AdminScreen s = new AdminScreen(userRepo, authManager, this);
+            primaryStage.setScene(new Scene(s.getView()));
+        } catch(Exception e) { e.printStackTrace(); }
     }
+
+    public static void main(String[] args) { launch(args); }
 }

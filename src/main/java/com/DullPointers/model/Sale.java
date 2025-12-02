@@ -1,46 +1,49 @@
 package com.DullPointers.model;
 
 import com.DullPointers.model.enums.SaleStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Sale {
-    private Long id; // Database ID
+    private Long id; // Assuming you handle ID generation or use UUID string
     private LocalDateTime saleDate;
     private SaleStatus status;
-    private User cashier; // (Req 15 - Link to user)
-    private Customer customer; // (Req 18 - Link to customer)
+    private User cashier;
     private List<SaleLineItem> items;
-    private List<Payment> payments; // (Req 7 - Split payments)
+    private List<Payment> payments;
 
-    public Sale() {}
+    // NEW FIELDS
+    private Customer customer;
+    private int pointsRedeemed;
 
-    public Sale(User cashier) {
-        this.saleDate = LocalDateTime.now();
-        this.status = SaleStatus.PENDING;
-        this.cashier = cashier;
+    public Sale() {
         this.items = new ArrayList<>();
         this.payments = new ArrayList<>();
     }
 
-    // Logic: Add item to sale
+    public Sale(User cashier) {
+        this();
+        this.saleDate = LocalDateTime.now();
+        this.status = SaleStatus.PENDING;
+        this.cashier = cashier;
+        this.pointsRedeemed = 0;
+    }
+
     public void addItem(Product product, int quantity) {
         items.add(new SaleLineItem(product, quantity));
     }
 
-    // Logic: Calculate Grand Total (Req 4)
     public BigDecimal calculateGrandTotal() {
         BigDecimal total = BigDecimal.ZERO;
         for (SaleLineItem item : items) {
             total = total.add(item.getSubTotal());
         }
-        // Note: You would subtract discounts and add tax here
         return total;
     }
 
-    // Logic: Calculate how much is paid so far
     public BigDecimal calculateTotalPaid() {
         BigDecimal paid = BigDecimal.ZERO;
         for (Payment p : payments) {
@@ -49,16 +52,28 @@ public class Sale {
         return paid;
     }
 
-    // Logic: Check if fully paid
-    public boolean isFullyPaid() {
-        return calculateTotalPaid().compareTo(calculateGrandTotal()) >= 0;
+    // Logic: Total - Points Discount
+    @JsonIgnore
+    public BigDecimal getNetPayableAmount() {
+        BigDecimal subtotal = calculateGrandTotal();
+        BigDecimal discount = BigDecimal.valueOf(pointsRedeemed);
+        BigDecimal net = subtotal.subtract(discount);
+        return net.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : net;
     }
 
-    // Getters
+    public boolean isFullyPaid() {
+        return calculateTotalPaid().compareTo(getNetPayableAmount()) >= 0;
+    }
+
+    // Getters & Setters
     public List<SaleLineItem> getItems() { return items; }
     public List<Payment> getPayments() { return payments; }
-    public void setCustomer(Customer customer) { this.customer = customer; }
     public void setStatus(SaleStatus status) { this.status = status; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public Customer getCustomer() { return customer; }
+    public void setCustomer(Customer customer) { this.customer = customer; }
+    public int getPointsRedeemed() { return pointsRedeemed; }
+    public void setPointsRedeemed(int pointsRedeemed) { this.pointsRedeemed = pointsRedeemed; }
+    public LocalDateTime getSaleDate() { return saleDate; }
 }

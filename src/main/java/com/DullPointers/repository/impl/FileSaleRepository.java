@@ -15,6 +15,11 @@ public class FileSaleRepository implements SaleRepository {
     }
 
     @Override
+    public List<Sale> findAll() {
+        return database;
+    }
+
+    @Override
     public void save(Sale sale) {
         // Generate ID if missing
         if (sale.getId() == null) {

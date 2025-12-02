@@ -4,8 +4,8 @@ import com.DullPointers.model.Customer;
 import com.DullPointers.repository.CustomerRepository;
 import com.DullPointers.util.JsonDataStore;
 
+import java.util.ArrayList;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.List;
 
 public class FileCustomerRepository implements CustomerRepository {
@@ -21,22 +21,14 @@ public class FileCustomerRepository implements CustomerRepository {
         return database;
     }
 
-    public Optional<Customer> findById(UUID id) {
+    public List<Customer> search(String key) {
+        List<Customer> customers = new ArrayList<Customer>();
         for (Customer customer : database) {
-            if (customer.getId().equals(id)) {
-                return Optional.of(customer);
+            if (customer.getId().equals(key) || customer.getName().equals(key) || customer.getPhoneNumber().equals(key)) {
+                customers.add(customer);
             }
         }
-        return Optional.empty();
-    }
-
-    public Optional<Customer> findByNameOrPhone(String key) {
-        for (Customer customer : database) {
-            if (customer.getName().equals(key) || customer.getPhoneNumber().equals(key)) {
-                return Optional.of(customer);
-            }
-        }
-        return Optional.empty();
+        return customers;
     }
 
     public void save(Customer customer) {
