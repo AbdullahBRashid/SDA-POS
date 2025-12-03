@@ -4,7 +4,7 @@ import com.DullPointers.model.enums.PaymentMethod;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class Payment {
+public class Payment implements IPayment {
     private BigDecimal amount;
     private PaymentMethod method;
     private LocalDateTime timestamp;
@@ -19,6 +19,8 @@ public class Payment {
         this.timestamp = LocalDateTime.now();
     }
 
+    @Override
     public BigDecimal getAmount() { return amount; }
+    @Override
     public PaymentMethod getMethod() { return method; }
 }

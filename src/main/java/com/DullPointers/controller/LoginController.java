@@ -1,28 +1,25 @@
 package com.DullPointers.controller;
 
-import com.DullPointers.manager.AuthManager;
-import com.DullPointers.manager.LogManager;
-import com.DullPointers.model.Log;
-import com.DullPointers.model.User;
+import com.DullPointers.manager.IAuthManager;
+import com.DullPointers.manager.ILogManager;
+import com.DullPointers.model.IUser;
 import com.DullPointers.model.enums.LogType;
 import com.DullPointers.model.enums.Role;
-import com.DullPointers.repository.LogRepository;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
-public class LoginController {
+public class LoginController implements ILoginController {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField pinField;
     @FXML private Label errorLabel;
     @FXML private Button loginButton;
 
-    private AuthManager authManager;
-    private LogManager logManager;
+    private IAuthManager authManager;
+    private ILogManager logManager;
     // Interface for view navigation (DIP) - implemented by main application
     private ViewNavigator navigator;
 
@@ -30,14 +27,17 @@ public class LoginController {
      * Dependency Injection setter for AuthManager.
      * This ensures the Controller doesn't tightly couple to the creation of Manager.
      */
-    public void setAuthManager(AuthManager authManager) {
+    @Override
+    public void setAuthManager(IAuthManager authManager) {
         this.authManager = authManager;
     }
 
-    public void setLogManager(LogManager logManager) {
+    @Override
+    public void setLogManager(ILogManager logManager) {
         this.logManager = logManager;
     }
 
+    @Override
     public void setNavigator(ViewNavigator navigator) {
         this.navigator = navigator;
     }
@@ -53,7 +53,7 @@ public class LoginController {
         }
 
         try {
-            User user = authManager.authenticate(username, pin);
+            IUser user = authManager.authenticate(username, pin);
 
             // clear fields for security
             pinField.clear();
@@ -75,7 +75,7 @@ public class LoginController {
         }
     }
 
-    private void routeUser(User user) {
+    private void routeUser(IUser user) {
         if (navigator == null) {
             System.err.println("Navigator not set. Cannot route user.");
             return;
@@ -102,10 +102,4 @@ public class LoginController {
         errorLabel.setVisible(true);
     }
 
-    // Simple interface to decouple navigation logic from the controller
-    public interface ViewNavigator {
-        void navigateToCashierView();
-        void navigateToAdminView();
-        void navigateToManagerView();
-    }
 }

@@ -1,11 +1,12 @@
 package com.DullPointers.controller;
 
-import com.DullPointers.manager.AuthManager;
-import com.DullPointers.manager.LogManager;
-import com.DullPointers.manager.SaleManager;
+import com.DullPointers.manager.IAuthManager;
+import com.DullPointers.manager.ILogManager;
+import com.DullPointers.manager.ISaleManager;
 import com.DullPointers.model.Customer;
+import com.DullPointers.model.ICustomer;
 import com.DullPointers.model.Sale;
-import com.DullPointers.model.SaleLineItem;
+import com.DullPointers.model.ISaleLineItem;
 import com.DullPointers.model.enums.PaymentMethod;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
@@ -15,30 +16,26 @@ import com.DullPointers.util.CustomerAnalytics;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.control.cell.TextFieldTableCell; // Import needed
-import javafx.util.converter.IntegerStringConverter; // Import needed
 import javafx.scene.layout.GridPane;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
-public class CashierController {
+public class CashierController implements ICashierController {
 
 
     // --- UI Components ---
     @FXML private Label currentUserLabel;
-    @FXML private TableView<SaleLineItem> cartTable;
-    @FXML private TableColumn<SaleLineItem, Void> colDelete;
-    @FXML private TableColumn<SaleLineItem, String> colProduct;
-    @FXML private TableColumn<SaleLineItem, BigDecimal> colPrice;
-    @FXML private TableColumn<SaleLineItem, Integer> colQty;
-    @FXML private TableColumn<SaleLineItem, BigDecimal> colTotal;
+    @FXML private TableView<ISaleLineItem> cartTable;
+    @FXML private TableColumn<ISaleLineItem, Void> colDelete;
+    @FXML private TableColumn<ISaleLineItem, String> colProduct;
+    @FXML private TableColumn<ISaleLineItem, BigDecimal> colPrice;
+    @FXML private TableColumn<ISaleLineItem, Integer> colQty;
+    @FXML private TableColumn<ISaleLineItem, BigDecimal> colTotal;
 
     @FXML private TextField barcodeField;
     @FXML private TextField customerSearchField;
@@ -54,15 +51,16 @@ public class CashierController {
     @FXML private ComboBox<PaymentMethod> paymentMethodCombo;
 
     // --- Dependencies ---
-    private LogManager logmanager;
-    private SaleManager saleManager;
-    private AuthManager authManager;
+    private ILogManager logmanager;
+    private ISaleManager saleManager;
+    private IAuthManager authManager;
     private CustomerRepository customerRepository;
     private SaleRepository saleRepository;
     private Runnable logoutHandler;
 
     // --- Initialization ---
     @FXML
+    @Override
     public void initialize() {
         // 1. Enable Editing on the Table
         cartTable.setEditable(true);
@@ -81,7 +79,7 @@ public class CashierController {
 
         // C. Handle the "Enter Key" event (Commit)
         colQty.setOnEditCommit(event -> {
-            SaleLineItem item = event.getRowValue();
+            ISaleLineItem item = event.getRowValue();
             Integer newQty = event.getNewValue();
 
             // Validation: Quantity must be positive
@@ -108,7 +106,7 @@ public class CashierController {
             {
                 deleteBtn.getStyleClass().add("table-delete-btn"); // Ensure this class exists in CSS
                 deleteBtn.setOnAction(event -> {
-                    SaleLineItem item = getTableView().getItems().get(getIndex());
+                    ISaleLineItem item = getTableView().getItems().get(getIndex());
                     handleDeleteItem(item);
                 });
             }
@@ -130,7 +128,8 @@ public class CashierController {
         paymentMethodCombo.getSelectionModel().select(PaymentMethod.CASH);
     }
 
-    public void setManagers(LogManager logManager, SaleManager saleManager, AuthManager authManager,
+    @Override
+    public void setManagers(ILogManager logManager, ISaleManager saleManager, IAuthManager authManager,
                             CustomerRepository customerRepo, SaleRepository saleRepo) {
         this.saleManager = saleManager;
         this.authManager = authManager;
@@ -144,6 +143,7 @@ public class CashierController {
         updateUI();
     }
 
+    @Override
     public void setLogoutHandler(Runnable handler) {
         this.logoutHandler = handler;
     }
@@ -170,7 +170,7 @@ public class CashierController {
     }
 
     @FXML
-    private void handleDeleteItem(SaleLineItem item) {
+    private void handleDeleteItem(ISaleLineItem item) {
         // 1. Call Manager to remove logic
         saleManager.removeItemFromSale(item);
 
@@ -185,12 +185,12 @@ public class CashierController {
     private void handleCustomerSearch() {
         String query = customerSearchField.getText().trim();
         if(query.isEmpty()) return;
-        List<Customer> results = customerRepository.search(query);
+        List<ICustomer> results = customerRepository.search(query);
 
         if (results.isEmpty()) showAlert("Not Found", "No customer found.");
         else if (results.size() == 1) linkCustomer(results.get(0));
         else {
-            ChoiceDialog<Customer> dialog = new ChoiceDialog<>(results.get(0), results);
+            ChoiceDialog<ICustomer> dialog = new ChoiceDialog<>(results.get(0), results);
             dialog.setTitle("Select Customer");
             dialog.setContentText("Choose one:");
             dialog.showAndWait().ifPresent(this::linkCustomer);
@@ -199,7 +199,7 @@ public class CashierController {
 
     @FXML
     private void handleNewCustomer() {
-        Dialog<Customer> dialog = new Dialog<>();
+        Dialog<ICustomer> dialog = new Dialog<>();
         dialog.setTitle("New Customer");
         dialog.setHeaderText("Register");
         ButtonType createType = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
@@ -214,7 +214,7 @@ public class CashierController {
 
         dialog.setResultConverter(btn -> {
             if (btn == createType) {
-                Customer c = new Customer(phoneF.getText(), nameF.getText());
+                ICustomer c = new Customer(phoneF.getText(), nameF.getText());
                 customerRepository.save(c);
                 return c;
             }
@@ -293,7 +293,7 @@ public class CashierController {
     @FXML private void handleLogout() { if(logoutHandler != null) logoutHandler.run(); }
     @FXML private void handleCancel() { saleManager.startNewSale(); updateUI(); }
 
-    private void linkCustomer(Customer c) {
+    private void linkCustomer(ICustomer c) {
         saleManager.setCustomer(c);
         customerSearchField.clear();
         updateUI();

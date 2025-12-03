@@ -1,7 +1,7 @@
 package com.DullPointers.repository.impl;
 
+import com.DullPointers.model.ILog;
 import com.DullPointers.model.Log;
-import com.DullPointers.model.Sale;
 import com.DullPointers.model.enums.LogType;
 import com.DullPointers.repository.LogRepository;
 import com.DullPointers.util.JsonDataStore;
@@ -13,28 +13,28 @@ import java.util.Objects;
 public class FileLogRepository implements LogRepository {
     private static final String FILE_PATH = "logs.json";
 
-    private final List<Log> database;
+    private final List<ILog> database;
 
     public FileLogRepository() {
         this.database = JsonDataStore.load(FILE_PATH, Log[].class);
     }
 
     @Override
-    public List<Log> findByType(LogType type) {
+    public List<ILog> findByType(LogType type) {
         return database.stream()
                 .filter(l -> l.getType().equals(type))
                 .toList();
     }
 
     @Override
-    public List<Log> findAll() {
+    public List<ILog> findAll() {
         return new ArrayList<>(database);
     }
 
     @Override
-    public void save(Log log) {
+    public void save(ILog log) {
         if (log.getId() == null) {
-            long maxId = database.stream().mapToLong(Log::getId).max().orElse(0);
+            long maxId = database.stream().mapToLong(ILog::getId).max().orElse(0);
             log.setId(maxId + 1);
         }
 

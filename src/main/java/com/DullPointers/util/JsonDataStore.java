@@ -38,11 +38,11 @@ public class JsonDataStore {
         }
     }
 
-    public static <T> List<T> load(String fileName, Class<T[]> clazz) {
+    public static <T, U extends T> List<T> load(String fileName, Class<U[]> clazz) {
         File file = new File(fileName);
         if (!file.exists()) return new ArrayList<>(); // Return empty list if no file
         try {
-            T[] arr = mapper.readValue(file, clazz);
+            U[] arr = mapper.readValue(file, clazz);
             return new ArrayList<>(Arrays.asList(arr));
         } catch (IOException e) {
             e.printStackTrace();

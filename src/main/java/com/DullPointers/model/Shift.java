@@ -2,7 +2,7 @@ package com.DullPointers.model;
 
 import java.time.ZonedDateTime;
 
-public class Shift {
+public class Shift implements IShift {
     private String username;
     private ZonedDateTime startTime;
     private ZonedDateTime endTime;
@@ -14,6 +14,7 @@ public class Shift {
         this.startTime = startTime;
     }
 
+    @Override
     public void setEndTime(ZonedDateTime endTime) {
         this.endTime = endTime;
     }

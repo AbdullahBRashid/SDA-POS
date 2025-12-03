@@ -1,14 +1,14 @@
 package com.DullPointers.util;
 
-import com.DullPointers.model.Customer;
+import com.DullPointers.model.ICustomer;
 import com.DullPointers.model.Sale;
 import com.DullPointers.repository.SaleRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public class CustomerAnalytics {
-    public static String generateReport(Customer customer, SaleRepository saleRepo) {
+public interface CustomerAnalytics {
+    static String generateReport(ICustomer customer, SaleRepository saleRepo) {
         List<Sale> history = saleRepo.findAll().stream()
                 .filter(s -> s.getCustomer() != null && s.getCustomer().getId().equals(customer.getId()))
                 .toList();

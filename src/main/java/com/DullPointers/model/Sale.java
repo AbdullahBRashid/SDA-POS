@@ -11,12 +11,12 @@ public class Sale {
     private Long id; // Assuming you handle ID generation or use UUID string
     private LocalDateTime saleDate;
     private SaleStatus status;
-    private User cashier;
-    private List<SaleLineItem> items;
-    private List<Payment> payments;
+    private IUser cashier;
+    private List<ISaleLineItem> items;
+    private List<IPayment> payments;
 
     // NEW FIELDS
-    private Customer customer;
+    private ICustomer customer;
     private int pointsRedeemed;
 
     public Sale() {
@@ -24,7 +24,7 @@ public class Sale {
         this.payments = new ArrayList<>();
     }
 
-    public Sale(User cashier) {
+    public Sale(IUser cashier) {
         this();
         this.saleDate = LocalDateTime.now();
         this.status = SaleStatus.PENDING;
@@ -32,13 +32,13 @@ public class Sale {
         this.pointsRedeemed = 0;
     }
 
-    public void addItem(Product product, int quantity) {
+    public void addItem(IProduct product, int quantity) {
         items.add(new SaleLineItem(product, quantity));
     }
 
     public BigDecimal calculateGrandTotal() {
         BigDecimal total = BigDecimal.ZERO;
-        for (SaleLineItem item : items) {
+        for (ISaleLineItem item : items) {
             total = total.add(item.getSubTotal());
         }
         return total;
@@ -46,7 +46,7 @@ public class Sale {
 
     public BigDecimal calculateTotalPaid() {
         BigDecimal paid = BigDecimal.ZERO;
-        for (Payment p : payments) {
+        for (IPayment p : payments) {
             paid = paid.add(p.getAmount());
         }
         return paid;
@@ -66,13 +66,13 @@ public class Sale {
     }
 
     // Getters & Setters
-    public List<SaleLineItem> getItems() { return items; }
-    public List<Payment> getPayments() { return payments; }
+    public List<ISaleLineItem> getItems() { return items; }
+    public List<IPayment> getPayments() { return payments; }
     public void setStatus(SaleStatus status) { this.status = status; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public Customer getCustomer() { return customer; }
-    public void setCustomer(Customer customer) { this.customer = customer; }
+    public ICustomer getCustomer() { return customer; }
+    public void setCustomer(ICustomer customer) { this.customer = customer; }
     public int getPointsRedeemed() { return pointsRedeemed; }
     public void setPointsRedeemed(int pointsRedeemed) { this.pointsRedeemed = pointsRedeemed; }
     public LocalDateTime getSaleDate() { return saleDate; }

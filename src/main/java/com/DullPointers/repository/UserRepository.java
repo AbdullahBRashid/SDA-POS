@@ -1,12 +1,12 @@
 package com.DullPointers.repository;
 
-import com.DullPointers.model.User;
+import com.DullPointers.model.IUser;
 import java.util.Optional;
 import java.util.List;
 
 public interface UserRepository {
-    Optional<User> findByUsername(String username);
-    List<User> findAll();
-    void save(User user);
-    void delete(User user);
+    Optional<IUser> findByUsername(String username);
+    List<IUser> findAll();
+    void save(IUser user);
+    void delete(IUser user);
 }

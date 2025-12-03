@@ -1,10 +1,7 @@
 package com.DullPointers.repository;
 
-import com.DullPointers.model.Shift;
-
-import java.util.List;
-import java.util.Optional;
+import com.DullPointers.model.IShift;
 
 public interface ShiftRepository {
-    void save(Shift shift);
+    void save(IShift shift);
 }

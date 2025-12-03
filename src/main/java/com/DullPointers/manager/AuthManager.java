@@ -1,22 +1,21 @@
 package com.DullPointers.manager;
 
+import com.DullPointers.model.IShift;
+import com.DullPointers.model.IUser;
 import com.DullPointers.model.Shift;
-import com.DullPointers.model.User;
 import com.DullPointers.repository.ShiftRepository;
 import com.DullPointers.repository.UserRepository;
-import com.DullPointers.util.JsonDataStore;
 import com.DullPointers.util.PasswordUtil;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-public class AuthManager {
+public class AuthManager implements IAuthManager {
     // Singleton
     private final UserRepository userRepository;
     private final ShiftRepository shiftRepository;
-    private User currentUser;
-    private Shift currentShift;
+    private IUser currentUser;
+    private IShift currentShift;
 
     public AuthManager(UserRepository userRepository, ShiftRepository shiftRepository) {
         this.userRepository = userRepository;
@@ -24,11 +23,12 @@ public class AuthManager {
     }
 
     // Logic for Req 14: Authentication
-    public User authenticate(String username, String pin) throws SecurityException {
-        Optional<User> userOpt = userRepository.findByUsername(username);
+    @Override
+    public IUser authenticate(String username, String pin) throws SecurityException {
+        Optional<IUser> userOpt = userRepository.findByUsername(username);
 
         if (userOpt.isPresent()) {
-            User user = userOpt.get();
+            IUser user = userOpt.get();
             // In real life, use BCrypt here, not equals()
             String storedHash = user.getPasswordHash();
 
@@ -44,6 +44,7 @@ public class AuthManager {
         throw new SecurityException("Invalid credentials");
     }
 
+    @Override
     public void logout() {
         if (currentUser != null && currentShift != null) {
             ZonedDateTime now = ZonedDateTime.now();
@@ -55,7 +56,8 @@ public class AuthManager {
         this.currentShift = null;
     }
 
-    public User getCurrentUser() {
+    @Override
+    public IUser getCurrentUser() {
         if (currentUser == null) {
             throw new SecurityException("No user logged in.");
         }

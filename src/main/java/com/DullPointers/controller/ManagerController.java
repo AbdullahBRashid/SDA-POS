@@ -1,7 +1,8 @@
 package com.DullPointers.controller;
 
-import com.DullPointers.manager.NotificationManager;
-import com.DullPointers.manager.LogManager;
+import com.DullPointers.manager.INotificationManager;
+import com.DullPointers.manager.ILogManager;
+import com.DullPointers.model.IProduct;
 import com.DullPointers.model.Product;
 import com.DullPointers.repository.ProductRepository;
 import javafx.beans.property.SimpleObjectProperty;
@@ -12,12 +13,12 @@ import javafx.scene.control.*;
 
 import java.math.BigDecimal;
 
-public class ManagerController {
+public class ManagerController implements IManagerController {
 
-    @FXML private TableView<Product> productTable;
-    @FXML private TableColumn<Product, String> colBarcode;
-    @FXML private TableColumn<Product, String> colName;
-    @FXML private TableColumn<Product, Integer> colStock;
+    @FXML private TableView<IProduct> productTable;
+    @FXML private TableColumn<IProduct, String> colBarcode;
+    @FXML private TableColumn<IProduct, String> colName;
+    @FXML private TableColumn<IProduct, Integer> colStock;
 
     @FXML private TextField barcodeField;
     @FXML private TextField nameField;
@@ -27,19 +28,21 @@ public class ManagerController {
 
     @FXML private ListView<String> notificationList; // NEW
 
-    private LogManager logManager;
+    private ILogManager logManager;
     private ProductRepository productRepository;
-    private NotificationManager notificationManager;
+    private INotificationManager notificationManager;
     private Runnable logoutHandler;
 
     @FXML
+    @Override
     public void initialize() {
         colBarcode.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getBarcode()));
         colName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
         colStock.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getStockQuantity()));
     }
 
-    public void setDependencies(LogManager logman, ProductRepository repo, NotificationManager notifMgr, Runnable logout) {
+    @Override
+    public void setDependencies(ILogManager logman, ProductRepository repo, INotificationManager notifMgr, Runnable logout) {
         this.logManager = logman;
         this.productRepository = repo;
         this.notificationManager = notifMgr;
@@ -57,7 +60,7 @@ public class ManagerController {
             int stock = Integer.parseInt(stockField.getText());
 
             // Create new product object
-            Product product = new Product(barcode, name, price, stock);
+            IProduct product = new Product(barcode, name, price, stock);
 
             // Save to repo (Assumes your ProductRepository has a save method)
             productRepository.save(product);
@@ -91,7 +94,8 @@ public class ManagerController {
         loadProducts();
     }
 
-    public void setLogManager(LogManager logManager) {
+    @Override
+    public void setLogManager(ILogManager logManager) {
         this.logManager = logManager;
     }
 

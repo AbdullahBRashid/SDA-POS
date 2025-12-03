@@ -1,5 +1,6 @@
 package com.DullPointers;
 
+import com.DullPointers.controller.IManagerController;
 import com.DullPointers.manager.*;
 import com.DullPointers.repository.*;
 import com.DullPointers.repository.impl.*;
@@ -22,11 +23,11 @@ public class Main extends Application implements ViewNavigator {
     private CustomerRepository customerRepo;
 
     // Managers (Business Logic Layer)
-    private AuthManager authManager;
-    private InventoryManager inventoryManager;
-    private SaleManager saleManager;
-    private LogManager logManager;
-    private NotificationManager notificationManager;
+    private IAuthManager authManager;
+    private IInventoryManager inventoryManager;
+    private ISaleManager saleManager;
+    private ILogManager logManager;
+    private INotificationManager notificationManager;
 
     @Override
     public void init() {
@@ -92,7 +93,7 @@ public class Main extends Application implements ViewNavigator {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ManagerView.fxml"));
             Parent root = loader.load();
-            com.DullPointers.controller.ManagerController c = loader.getController();
+            IManagerController c = loader.getController();
 
             c.setDependencies(logManager, productRepo, notificationManager, () -> { authManager.logout(); showLogin(); });
 

@@ -1,5 +1,6 @@
 package com.DullPointers.repository.impl;
 
+import com.DullPointers.model.IProduct;
 import com.DullPointers.model.Product;
 import com.DullPointers.repository.ProductRepository;
 import com.DullPointers.util.JsonDataStore;
@@ -12,7 +13,7 @@ import java.util.Optional;
 public class FileProductRepository implements ProductRepository {
     // Change in .gitignore too if file name or path changes.
     private static final String FILE_PATH = "products.json";
-    private List<Product> database;
+    private List<IProduct> database;
 
     public FileProductRepository() {
         // 1. Load data from file on startup
@@ -31,14 +32,14 @@ public class FileProductRepository implements ProductRepository {
     }
 
     @Override
-    public Optional<Product> findByBarcode(String barcode) {
+    public Optional<IProduct> findByBarcode(String barcode) {
         return database.stream()
                 .filter(p -> p.getBarcode().equals(barcode))
                 .findFirst();
     }
 
     @Override
-    public void save(Product product) {
+    public void save(IProduct product) {
         // Remove old version if exists (to update)
         database.removeIf(p -> p.getBarcode().equals(product.getBarcode()));
         database.add(product);
@@ -49,7 +50,7 @@ public class FileProductRepository implements ProductRepository {
 
     // --- NEW METHOD ---
     @Override
-    public List<Product> findAll() {
+    public List<IProduct> findAll() {
         // Return a copy to protect the internal list
         return new ArrayList<>(database);
     }

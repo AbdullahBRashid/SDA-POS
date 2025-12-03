@@ -1,22 +1,22 @@
 package com.DullPointers.view;
 
-import com.DullPointers.controller.ManagerController;
-import com.DullPointers.manager.AuthManager;
-import com.DullPointers.manager.NotificationManager;
-import com.DullPointers.manager.LogManager;
+import com.DullPointers.controller.IManagerController;
+import com.DullPointers.manager.IAuthManager;
+import com.DullPointers.manager.INotificationManager;
+import com.DullPointers.manager.ILogManager;
 import com.DullPointers.repository.ProductRepository;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import java.io.IOException;
 
 public class ManagerScreen {
-    private final LogManager logManager;
+    private final ILogManager logManager;
     private final ProductRepository productRepository;
-    private final AuthManager authManager;
-    private final NotificationManager notificationManager;
+    private final IAuthManager authManager;
+    private final INotificationManager notificationManager;
     private final ViewNavigator navigator;
 
-    public ManagerScreen(LogManager logManager, ProductRepository productRepository, NotificationManager notificationManager, AuthManager authManager, ViewNavigator navigator) {
+    public ManagerScreen(ILogManager logManager, ProductRepository productRepository, INotificationManager notificationManager, IAuthManager authManager, ViewNavigator navigator) {
         this.productRepository = productRepository;
         this.authManager = authManager;
         this.notificationManager = notificationManager;
@@ -28,7 +28,7 @@ public class ManagerScreen {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ManagerView.fxml"));
         Parent root = loader.load();
 
-        ManagerController controller = loader.getController();
+        IManagerController controller = loader.getController();
         controller.setLogManager(logManager);
 
         // Wiring logic: Call Manager logout, then Switch View

@@ -1,9 +1,9 @@
 package com.DullPointers.view;
 
-import com.DullPointers.controller.CashierController;
-import com.DullPointers.manager.AuthManager;
-import com.DullPointers.manager.LogManager;
-import com.DullPointers.manager.SaleManager;
+import com.DullPointers.controller.ICashierController;
+import com.DullPointers.manager.IAuthManager;
+import com.DullPointers.manager.ILogManager;
+import com.DullPointers.manager.ISaleManager;
 import com.DullPointers.repository.CustomerRepository;
 import com.DullPointers.repository.SaleRepository;
 import javafx.fxml.FXMLLoader;
@@ -11,14 +11,14 @@ import javafx.scene.Parent;
 import java.io.IOException;
 
 public class CashierScreen {
-    private final LogManager logManager;
-    private final SaleManager saleManager;
-    private final AuthManager authManager;
+    private final ILogManager logManager;
+    private final ISaleManager saleManager;
+    private final IAuthManager authManager;
     private final CustomerRepository customerRepository;
     private final SaleRepository saleRepository;
     private final ViewNavigator navigator;
 
-    public CashierScreen(LogManager logManager, SaleManager saleManager, AuthManager authManager, CustomerRepository customerRepository, SaleRepository saleRepository, ViewNavigator navigator) {
+    public CashierScreen(ILogManager logManager, ISaleManager saleManager, IAuthManager authManager, CustomerRepository customerRepository, SaleRepository saleRepository, ViewNavigator navigator) {
         this.saleManager = saleManager;
         this.authManager = authManager;
         this.customerRepository = customerRepository;
@@ -31,7 +31,7 @@ public class CashierScreen {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CashierView.fxml"));
         Parent root = loader.load();
 
-        CashierController controller = loader.getController();
+        ICashierController controller = loader.getController();
         controller.setManagers(logManager, saleManager, authManager,  customerRepository, saleRepository);
 
         // HERE IS THE LOGIC LINK:

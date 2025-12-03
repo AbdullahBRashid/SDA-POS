@@ -1,7 +1,8 @@
 package com.DullPointers.controller;
 
-import com.DullPointers.manager.AuthManager;
-import com.DullPointers.manager.LogManager;
+import com.DullPointers.manager.IAuthManager;
+import com.DullPointers.manager.ILogManager;
+import com.DullPointers.model.IUser;
 import com.DullPointers.model.User;
 import com.DullPointers.model.enums.LogType;
 import com.DullPointers.model.enums.Role;
@@ -10,20 +11,18 @@ import com.DullPointers.repository.UserRepository;
 import com.DullPointers.util.PasswordUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.util.Callback;
 
 import java.util.Optional;
 
-public class AdminController {
+public class AdminController implements IAdminController {
 
     // --- UI Components ---
-    @FXML private TableView<User> userTable;
-    @FXML private TableColumn<User, String> colUsername;
-    @FXML private TableColumn<User, String> colRole;
-    @FXML private TableColumn<User, String> colStatus; // Just a placeholder for active/inactive
+    @FXML private TableView<IUser> userTable;
+    @FXML private TableColumn<IUser, String> colUsername;
+    @FXML private TableColumn<IUser, String> colRole;
+    @FXML private TableColumn<IUser, String> colStatus; // Just a placeholder for active/inactive
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -31,13 +30,14 @@ public class AdminController {
     @FXML private Label statusLabel;
 
     // --- Dependencies ---
-    private AuthManager authManager;
-    private LogManager logManager;
+    private IAuthManager authManager;
+    private ILogManager logManager;
     private UserRepository userRepository;
     private Runnable logoutHandler;
 
     // --- Initialization ---
     @FXML
+    @Override
     public void initialize() {
         // Initialize Table Columns
         colUsername.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getUsername()));
@@ -51,17 +51,20 @@ public class AdminController {
         usernameField.setOnKeyTyped(e -> statusLabel.setText(""));
     }
 
+    @Override
     public void setDependencies(UserRepository userRepository, Runnable logoutHandler) {
         this.userRepository = userRepository;
         this.logoutHandler = logoutHandler;
         loadUsers();
     }
 
-    public void setLogManager(LogManager logManager) {
+    @Override
+    public void setLogManager(ILogManager logManager) {
         this.logManager = logManager;
     }
 
-    public void setAuthManager(AuthManager authManager) {
+    @Override
+    public void setAuthManager(IAuthManager authManager) {
         this.authManager = authManager;
     }
 
@@ -93,7 +96,7 @@ public class AdminController {
             String passwordHash  = PasswordUtil.hash(password);
 
             // 2. Create User Model
-            User newUser = new User(username, passwordHash, role);
+            IUser newUser = new User(username, passwordHash, role);
 
             // 3. Save to Repo
             userRepository.save(newUser);
@@ -114,7 +117,7 @@ public class AdminController {
 
     @FXML
     private void handleDeleteUser() {
-        User selectedUser = userTable.getSelectionModel().getSelectedItem();
+        IUser selectedUser = userTable.getSelectionModel().getSelectedItem();
         if (selectedUser == null) {
             statusLabel.setText("Select a user to delete.");
             return;
