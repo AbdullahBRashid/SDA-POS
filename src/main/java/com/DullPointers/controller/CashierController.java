@@ -39,7 +39,6 @@ public class CashierController implements ICashierController {
 
     @FXML private TextField barcodeField;
     @FXML private TextField customerSearchField;
-    @FXML private Label messageLabel;
     @FXML private Label subtotalLabel;
     @FXML private Label taxLabel;
     @FXML private Label grandTotalLabel;
@@ -90,12 +89,10 @@ public class CashierController implements ICashierController {
                 // Recalculate Totals & Refresh UI
                 // We call updateUI() to ensure the 'Total' column and 'Grand Total' labels update immediately
                 updateUI();
-                messageLabel.setText("Updated qty for " + item.getProduct().getName());
-                messageLabel.setStyle("-fx-text-fill: green;");
+                showAlert("All good", "Updated qty for " + item.getProduct().getName());
             } else {
                 // Invalid input: Refresh to revert the visual change in the table
-                messageLabel.setText("Quantity must be greater than 0");
-                messageLabel.setStyle("-fx-text-fill: red;");
+                showAlert("Error!", "Quantity must be greater than 0");
                 cartTable.refresh();
             }
         });
@@ -158,13 +155,11 @@ public class CashierController implements ICashierController {
         try {
             // Defaulting quantity to 1 for simple scan
             saleManager.addItemToSale(barcode, 1);
-            messageLabel.setText("Added: " + barcode);
-            messageLabel.setStyle("-fx-text-fill: green;");
+            showAlert( "Done", "Added: " + barcode);
             barcodeField.clear();
             updateUI(); // Refresh table and totals
         } catch (Exception e) {
-            messageLabel.setText("Error: " + e.getMessage());
-            messageLabel.setStyle("-fx-text-fill: red;");
+            showAlert("Error!", "Error: " + e.getMessage());
         }
         barcodeField.requestFocus();
     }
