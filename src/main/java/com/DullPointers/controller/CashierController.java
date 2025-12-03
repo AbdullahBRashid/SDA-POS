@@ -5,7 +5,7 @@ import com.DullPointers.manager.ILogManager;
 import com.DullPointers.manager.ISaleManager;
 import com.DullPointers.model.Customer;
 import com.DullPointers.model.ICustomer;
-import com.DullPointers.model.Sale;
+import com.DullPointers.model.ISale;
 import com.DullPointers.model.ISaleLineItem;
 import com.DullPointers.model.enums.PaymentMethod;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -240,7 +240,7 @@ public class CashierController implements ICashierController {
 
     @FXML
     private void handleCheckout() {
-        Sale sale = saleManager.getCurrentSale();
+        ISale sale = saleManager.getCurrentSale();
         if (sale == null || sale.getItems().isEmpty()) {
             showAlert("Error", "Cart empty");
             return;
@@ -260,7 +260,7 @@ public class CashierController implements ICashierController {
         }
     }
 
-    private void handleLoyaltyPayment(Sale sale, BigDecimal amount) {
+    private void handleLoyaltyPayment(ISale sale, BigDecimal amount) {
         if (sale.getCustomer() == null) {
             showAlert("Error", "Customer required for Loyalty Payment.");
             return;
@@ -297,7 +297,7 @@ public class CashierController implements ICashierController {
     // --- Helper Methods ---
 
     private void updateUI() {
-        Sale s = saleManager.getCurrentSale();
+        ISale s = saleManager.getCurrentSale();
         if (s != null) {
             cartTable.setItems(FXCollections.observableArrayList(s.getItems()));
             cartTable.refresh();

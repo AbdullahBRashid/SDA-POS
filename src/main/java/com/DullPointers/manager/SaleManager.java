@@ -16,7 +16,7 @@ public class SaleManager implements ISaleManager {
     private final IAuthManager authManager;
     private final CustomerRepository customerRepository;
 
-    private Sale currentSale;
+    private ISale currentSale;
 
     public SaleManager(IAuthManager authManager, SaleRepository saleRepository,
                        ProductRepository productRepository,
@@ -141,5 +141,5 @@ public class SaleManager implements ISaleManager {
     }
 
     @Override
-    public Sale getCurrentSale() { return currentSale; }
+    public ISale getCurrentSale() { return currentSale; }
 }

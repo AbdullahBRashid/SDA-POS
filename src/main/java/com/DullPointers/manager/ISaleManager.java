@@ -2,7 +2,7 @@ package com.DullPointers.manager;
 
 import com.DullPointers.model.ICustomer;
 import com.DullPointers.model.ISaleLineItem;
-import com.DullPointers.model.Sale;
+import com.DullPointers.model.ISale;
 import com.DullPointers.model.enums.PaymentMethod;
 
 import java.math.BigDecimal;
@@ -28,5 +28,5 @@ public interface ISaleManager {
     // Req 6: Finalize Sale & Generate Receipt
     void completeSale();
 
-    Sale getCurrentSale();
+    ISale getCurrentSale();
 }
