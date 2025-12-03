@@ -95,7 +95,7 @@ public class Main extends Application implements ViewNavigator {
             Parent root = loader.load();
             IManagerController c = loader.getController();
 
-            c.setDependencies(logManager, productRepo, notificationManager, () -> { authManager.logout(); showLogin(); });
+            c.setDependencies(saleRepo, logManager, productRepo, notificationManager, () -> { authManager.logout(); showLogin(); });
 
             primaryStage.setScene(new Scene(root));
         } catch(Exception e) { e.printStackTrace(); }

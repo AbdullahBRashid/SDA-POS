@@ -4,65 +4,121 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.DullPointers.controller.ManagerController">
+            fx:controller="com.DullPointers.controller.ManagerController"
+            stylesheets="@styles.css">
+
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #5e35b1; -fx-padding: 10;">
-            <Label text="Manager Dashboard" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
-            <HBox HBox.hgrow="ALWAYS"/>
-            <Button text="Logout" onAction="#handleLogout"/>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header-bar">
+            <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+            <Label text="Manager Dashboard" styleClass="header-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" text="Connected" textFill="white"/>
+            <Button text="Logout" onAction="#handleLogout" styleClass="logout-button"/>
         </HBox>
     </top>
 
     <center>
-        <VBox spacing="10">
-            <padding><Insets top="10" right="10" left="10" bottom="10"/></padding>
-            <TableView fx:id="productTable" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colBarcode" text="Barcode"/>
-                    <TableColumn fx:id="colName" text="Name"/>
-                    <TableColumn fx:id="colStock" text="Stock"/>
-                </columns>
-                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
-            </TableView>
-            <Button text="Refresh" onAction="#handleRefresh"/>
-        </VBox>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+
+            <Tab text="Inventory Management">
+                <SplitPane dividerPositions="0.7">
+                    <VBox spacing="10">
+                        <padding><Insets top="10" right="10" left="10" bottom="10"/></padding>
+                        <TableView fx:id="productTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colBarcode" text="Barcode"/>
+                                <TableColumn fx:id="colName" text="Name"/>
+                                <TableColumn fx:id="colStock" text="Stock"/>
+                                <TableColumn fx:id="colPrice" text="Price"/>
+                            </columns>
+                            <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                        </TableView>
+                        <HBox spacing="10">
+                            <Button text="Refresh List" onAction="#handleRefresh"/>
+                        </HBox>
+                    </VBox>
+
+                    <ScrollPane fitToWidth="true">
+                        <VBox spacing="10" styleClass="sidebar">
+                            <padding><Insets bottom="20" left="15" right="20" top="20" /></padding>
+                            <Label styleClass="section-header" text="Product Details" />
+
+                            <VBox spacing="5">
+                                <Label text="Barcode / SKU" />
+                                <TextField fx:id="barcodeField" promptText="Unique ID" />
+                            </VBox>
+                            <VBox spacing="5">
+                                <Label text="Name" />
+                                <TextField fx:id="nameField" promptText="Product Name" />
+                            </VBox>
+                            <VBox spacing="5">
+                                <Label text="Selling Price" />
+                                <TextField fx:id="priceField" promptText="0.00" />
+                            </VBox>
+                            <VBox spacing="5">
+                                <Label text="Initial Stock" />
+                                <TextField fx:id="stockField" promptText="0" />
+                            </VBox>
+
+                            <Label fx:id="msgLabel" wrapText="true" minHeight="30"/>
+
+                            <Button maxWidth="Infinity" onAction="#handleSaveProduct" styleClass="action-button" text="Save Product" />
+                            <Button maxWidth="Infinity" onAction="#handleClear" styleClass="secondary-button" text="Clear Form" />
+
+                            <Separator/>
+
+                            <Label text="Stock Alerts" style="-fx-font-weight: bold; -fx-text-fill: red;"/>
+                            <ListView fx:id="notificationList" prefHeight="150"/>
+                            <Button text="Clear Alerts" onAction="#handleClearNotifications" maxWidth="Infinity"/>
+                        </VBox>
+                    </ScrollPane>
+                </SplitPane>
+            </Tab>
+
+            <Tab text="Sales History">
+                <VBox spacing="10">
+                    <padding><Insets top="10" right="10" left="10" bottom="10"/></padding>
+                    <TableView fx:id="salesTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colSaleId" text="Sale ID"/>
+                            <TableColumn fx:id="colSaleDate" text="Date"/>
+                            <TableColumn fx:id="colSaleTotal" text="Total Amount"/>
+                        </columns>
+                        <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                    </TableView>
+                    <Button text="Refresh Sales" onAction="#handleRefreshSales"/>
+                </VBox>
+            </Tab>
+
+            <Tab text="Reports &amp; Analytics">
+                <VBox spacing="15">
+                    <padding><Insets top="20" right="20" left="20" bottom="20"/></padding>
+
+                    <TitledPane text="Configuration" collapsible="false">
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <padding><Insets top="10" right="10" left="10" bottom="10"/></padding>
+
+                            <VBox spacing="5">
+                                <Label text="Report Type:"/>
+                                <ComboBox fx:id="reportTypeCombo" prefWidth="200"/>
+                            </VBox>
+
+                            <VBox spacing="5" fx:id="productSelectContainer" visible="false" managed="false">
+                                <Label text="Select Product:"/>
+                                <ComboBox fx:id="productReportCombo" prefWidth="200" promptText="Choose Product..."/>
+                            </VBox>
+
+                            <Region HBox.hgrow="ALWAYS"/>
+
+                            <Button text="Generate Report" onAction="#handleGenerateReport" styleClass="action-button"/>
+                        </HBox>
+                    </TitledPane>
+
+                    <Label text="Report Output:"/>
+                    <TextArea fx:id="reportOutputArea" editable="false" style="-fx-font-family: 'Consolas', monospace;" VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </Tab>
+
+        </TabPane>
     </center>
-
-    <right>
-        <VBox spacing="10" style="-fx-border-color: #ccc; -fx-border-width: 0 0 0 1;">
-            <padding><Insets bottom="20" left="15" right="20" top="20" /></padding>
-
-            <Label styleClass="section-header" text="Product Details" />
-
-            <VBox spacing="5">
-                <Label text="Barcode / SKU" />
-                <TextField fx:id="barcodeField" promptText="Unique ID" />
-            </VBox>
-
-            <VBox spacing="5">
-                <Label text="Name" />
-                <TextField fx:id="nameField" promptText="Product Name" />
-            </VBox>
-
-            <VBox spacing="5">
-                <Label text="Selling Price" />
-                <TextField fx:id="priceField" promptText="0.00" />
-            </VBox>
-
-            <VBox spacing="5">
-                <Label text="Initial Stock" />
-                <TextField fx:id="stockField" promptText="0" />
-            </VBox>
-
-            <Label fx:id="msgLabel" wrapText="true" />
-
-            <Button maxWidth="Infinity" onAction="#handleSaveProduct" styleClass="action-button" text="Save Product" />
-            <Button maxWidth="Infinity" onAction="#handleClear" styleClass="secondary-button" text="Clear Form" />
-
-            <padding><Insets top="10" right="10" left="10" bottom="10"/></padding>
-            <Label text="Stock Alerts" style="-fx-font-weight: bold; -fx-text-fill: red;"/>
-            <ListView fx:id="notificationList" VBox.vgrow="ALWAYS"/>
-            <Button text="Clear Alerts" onAction="#handleClearNotifications" maxWidth="Infinity"/>
-        </VBox>
-    </right>
 </BorderPane>

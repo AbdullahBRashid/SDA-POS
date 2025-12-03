@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 
 public abstract class Report {
 
-    private void saveReport(String report) {
+    private String saveReport(String report) {
         // 1. Format date to remove illegal characters (like ':')
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
         String timestamp = LocalDateTime.now().format(formatter);
@@ -24,16 +24,17 @@ public abstract class Report {
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
             System.out.println("Saved successfully: " + fileName);
-
         } catch (IOException e) {
             System.err.println("Failed to save report: " + e.getMessage());
             e.printStackTrace();
+            return "Failed to Generate Report";
         }
+        return fileName;
     }
 
     protected abstract String createReport();
 
-    public final void generateReport() {
-        saveReport(createReport());
+    public final String generateReport() {
+        return saveReport(createReport());
     }
 }

@@ -48,3 +48,28 @@
     -fx-padding: 8;
     -fx-cursor: hand;
 }
+
+/* Tab Pane Styling */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #f5f5f5;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #e0e0e0;
+    -fx-background-insets: 0 1 0 0;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #fff;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1 1 0 1;
+}
+
+.tab-pane .tab-label {
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #5e35b1; /* Match header color */
+}

@@ -35,6 +35,7 @@ public class AdminScreen {
         };
 
         controller.setDependencies(userRepository, logoutAction);
+        controller.setAuthManager(authManager);
 
         return root;
     }

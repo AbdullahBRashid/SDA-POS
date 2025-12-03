@@ -5,6 +5,7 @@ import com.DullPointers.manager.IAuthManager;
 import com.DullPointers.manager.INotificationManager;
 import com.DullPointers.manager.ILogManager;
 import com.DullPointers.repository.ProductRepository;
+import com.DullPointers.repository.SaleRepository;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import java.io.IOException;
@@ -14,14 +15,16 @@ public class ManagerScreen {
     private final ProductRepository productRepository;
     private final IAuthManager authManager;
     private final INotificationManager notificationManager;
+    private final SaleRepository salerepository;
     private final ViewNavigator navigator;
 
-    public ManagerScreen(ILogManager logManager, ProductRepository productRepository, INotificationManager notificationManager, IAuthManager authManager, ViewNavigator navigator) {
+    public ManagerScreen(SaleRepository salerepository, ILogManager logManager, ProductRepository productRepository, INotificationManager notificationManager, IAuthManager authManager, ViewNavigator navigator) {
         this.productRepository = productRepository;
         this.authManager = authManager;
         this.notificationManager = notificationManager;
         this.navigator = navigator;
         this.logManager = logManager;
+        this.salerepository = salerepository;
     }
 
     public Parent getView() throws IOException {
@@ -37,7 +40,7 @@ public class ManagerScreen {
             navigator.showLogin();
         };
 
-        controller.setDependencies(logManager, productRepository, notificationManager, logoutAction);
+        controller.setDependencies(salerepository, logManager, productRepository, notificationManager, logoutAction);
 
         return root;
     }
