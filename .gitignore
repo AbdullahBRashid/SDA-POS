@@ -59,6 +59,7 @@ sales.json
 users.json
 products.json
 shifts.json
+logs.json
 
 
 # Maven

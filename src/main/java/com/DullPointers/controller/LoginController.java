@@ -1,8 +1,12 @@
 package com.DullPointers.controller;
 
 import com.DullPointers.manager.AuthManager;
+import com.DullPointers.manager.LogManager;
+import com.DullPointers.model.Log;
 import com.DullPointers.model.User;
+import com.DullPointers.model.enums.LogType;
 import com.DullPointers.model.enums.Role;
+import com.DullPointers.repository.LogRepository;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -18,6 +22,7 @@ public class LoginController {
     @FXML private Button loginButton;
 
     private AuthManager authManager;
+    private LogManager logManager;
     // Interface for view navigation (DIP) - implemented by main application
     private ViewNavigator navigator;
 
@@ -27,6 +32,10 @@ public class LoginController {
      */
     public void setAuthManager(AuthManager authManager) {
         this.authManager = authManager;
+    }
+
+    public void setLogManager(LogManager logManager) {
+        this.logManager = logManager;
     }
 
     public void setNavigator(ViewNavigator navigator) {
@@ -50,13 +59,18 @@ public class LoginController {
             pinField.clear();
             errorLabel.setVisible(false);
 
+            logManager.saveLog(LogType.SUCCESS, "User %s logged in successfully!".formatted(username));
+
             // Route based on Role (Open/Closed Principle applied via strategy or simple switch here)
             routeUser(user);
 
         } catch (SecurityException e) {
             showError("Invalid Login: " + e.getMessage());
+            logManager.saveLog(LogType.ERROR, "Invalid Login: " + e.getMessage());
+
         } catch (Exception e) {
             showError("System Error: " + e.getMessage());
+            logManager.saveLog(LogType.ERROR, "System Error: " + e.getMessage());
             e.printStackTrace();
         }
     }

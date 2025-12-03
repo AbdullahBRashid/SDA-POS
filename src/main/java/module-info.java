@@ -11,4 +11,5 @@ module com.DullPointers {
     opens com.DullPointers.model.enums to com.fasterxml.jackson.databind;
 
     exports com.DullPointers;
+    opens com.DullPointers.manager to javafx.fxml;
 }

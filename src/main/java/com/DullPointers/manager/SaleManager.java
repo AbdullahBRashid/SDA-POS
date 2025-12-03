@@ -18,10 +18,9 @@ public class SaleManager {
 
     private Sale currentSale;
 
-    public SaleManager(SaleRepository saleRepository,
+    public SaleManager(AuthManager authManager, SaleRepository saleRepository,
                        ProductRepository productRepository,
                        InventoryManager inventoryManager,
-                       AuthManager authManager,
                        CustomerRepository customerRepository) {
         this.saleRepository = saleRepository;
         this.productRepository = productRepository;
@@ -30,24 +29,32 @@ public class SaleManager {
         this.customerRepository = customerRepository;
     }
 
+    // Req 1: Start a new transaction
     public void startNewSale() {
         this.currentSale = new Sale(authManager.getCurrentUser());
     }
 
+    // Req 2 & 10: Add item by scanning barcode
     public void addItemToSale(String barcode, int quantity) {
         if (currentSale == null) startNewSale();
+
+        // 1. Check Inventory First (Delegation)
         if (!inventoryManager.checkStock(barcode, quantity)) {
             throw new IllegalStateException("Item Out of Stock: " + barcode);
         }
+
+        // 2. Find product
         Product product = productRepository.findByBarcode(barcode)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
+        // 3. Add to Sale
         for (SaleLineItem item : currentSale.getItems()) {
             if (item.getProduct().getBarcode().equals(barcode)) {
                 item.setQuantity(item.getQuantity() + quantity);
                 return;
             }
         }
+
         currentSale.addItem(product, quantity);
     }
 
@@ -76,12 +83,15 @@ public class SaleManager {
         }
     }
 
+    // Req 7: Add Payment (Split payment logic)
     public void addPayment(BigDecimal amount, PaymentMethod method) {
         if (currentSale == null) throw new IllegalStateException("No active sale");
+
         Payment payment = new Payment(amount, method, "REF-" + System.currentTimeMillis());
         currentSale.getPayments().add(payment);
     }
 
+    // Req 6: Finalize Sale & Generate Receipt
     public void completeSale() {
         if (currentSale == null) throw new IllegalStateException("No active sale");
 
@@ -98,7 +108,7 @@ public class SaleManager {
             customerRepository.save(c);
         }
 
-        // 3. Update Inventory (Triggers alerts)
+        // 2. Update Inventory (Req 9)
         currentSale.getItems().forEach(item -> {
             inventoryManager.reduceStock(item.getProduct().getBarcode(), item.getQuantity());
         });
@@ -116,6 +126,8 @@ public class SaleManager {
 
         // 5. Finalize
         currentSale.setStatus(SaleStatus.COMPLETED);
+
+        // 4. Save to DB
         saleRepository.save(currentSale);
         System.out.println("Receipt Generated. ID: " + currentSale.getId());
         this.currentSale = null;

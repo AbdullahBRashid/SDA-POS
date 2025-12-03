@@ -1,6 +1,9 @@
 package com.DullPointers.controller;
 
+import com.DullPointers.manager.AuthManager;
+import com.DullPointers.manager.LogManager;
 import com.DullPointers.model.User;
+import com.DullPointers.model.enums.LogType;
 import com.DullPointers.model.enums.Role;
 import com.DullPointers.repository.UserRepository;
 // import com.DullPointers.util.PasswordUtil;
@@ -28,6 +31,8 @@ public class AdminController {
     @FXML private Label statusLabel;
 
     // --- Dependencies ---
+    private AuthManager authManager;
+    private LogManager logManager;
     private UserRepository userRepository;
     private Runnable logoutHandler;
 
@@ -50,6 +55,14 @@ public class AdminController {
         this.userRepository = userRepository;
         this.logoutHandler = logoutHandler;
         loadUsers();
+    }
+
+    public void setLogManager(LogManager logManager) {
+        this.logManager = logManager;
+    }
+
+    public void setAuthManager(AuthManager authManager) {
+        this.authManager = authManager;
     }
 
     private void loadUsers() {
@@ -84,6 +97,8 @@ public class AdminController {
 
             // 3. Save to Repo
             userRepository.save(newUser);
+
+            logManager.saveLog(LogType.SUCCESS, "Admin '%s' created new user '%s'".formatted(authManager.getCurrentUser().getUsername(),username));
 
             // 4. Update UI
             statusLabel.setText("User created successfully.");

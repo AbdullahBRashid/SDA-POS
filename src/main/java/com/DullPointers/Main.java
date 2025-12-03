@@ -19,12 +19,13 @@ public class Main extends Application implements ViewNavigator {
     private UserRepository userRepo;
     private ProductRepository productRepo;
     private SaleRepository saleRepo;
-    private ShiftRepository shiftRepo;
     private CustomerRepository customerRepo;
 
+    // Managers (Business Logic Layer)
     private AuthManager authManager;
     private InventoryManager inventoryManager;
     private SaleManager saleManager;
+    private LogManager logManager;
     private NotificationManager notificationManager;
 
     @Override
@@ -33,28 +34,35 @@ public class Main extends Application implements ViewNavigator {
         this.userRepo = new FileUserRepository();
         this.productRepo = new FileProductRepository();
         this.saleRepo = new FileSaleRepository();
-        this.shiftRepo = new FileShiftRepository();
+        ShiftRepository shiftRepo = new FileShiftRepository();
         this.customerRepo = new FileCustomerRepository();
+        LogRepository logRepo = new FileLogRepository();
 
         // 2. Business Layer
         this.notificationManager = new NotificationManager();
         this.inventoryManager = new InventoryManager(productRepo, notificationManager);
+        this.logManager = new LogManager(logRepo);
         this.authManager = new AuthManager(userRepo, shiftRepo);
-        this.saleManager = new SaleManager(saleRepo, productRepo, inventoryManager, authManager, customerRepo);
+        this.saleManager = new SaleManager(authManager, saleRepo, productRepo, inventoryManager, customerRepo);
     }
 
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
+        this.primaryStage.setTitle("Java POS System");
+
+        // Start the app at the Login Screen
         showLogin();
         stage.show();
     }
 
-    // --- NAVIGATION ---
+    // --- VIEW NAVIGATOR IMPLEMENTATION ---
+    // These methods allow your screens to switch views without knowing the details
+
     @Override
     public void showLogin() {
         try {
-            LoginScreen s = new LoginScreen(authManager, this);
+            LoginScreen s = new LoginScreen(logManager, authManager, this);
             primaryStage.setScene(new Scene(s.getView()));
         } catch(Exception e) { e.printStackTrace(); }
     }
@@ -64,6 +72,7 @@ public class Main extends Application implements ViewNavigator {
         try {
             // Updated to pass the repositories
             CashierScreen screen = new CashierScreen(
+                    logManager,
                     saleManager,
                     authManager,
                     customerRepo,
@@ -85,7 +94,7 @@ public class Main extends Application implements ViewNavigator {
             Parent root = loader.load();
             com.DullPointers.controller.ManagerController c = loader.getController();
 
-            c.setDependencies(productRepo, notificationManager, () -> { authManager.logout(); showLogin(); });
+            c.setDependencies(logManager, productRepo, notificationManager, () -> { authManager.logout(); showLogin(); });
 
             primaryStage.setScene(new Scene(root));
         } catch(Exception e) { e.printStackTrace(); }
@@ -94,7 +103,7 @@ public class Main extends Application implements ViewNavigator {
     @Override
     public void showAdmin() {
         try {
-            AdminScreen s = new AdminScreen(userRepo, authManager, this);
+            AdminScreen s = new AdminScreen(logManager, userRepo, authManager, this);
             primaryStage.setScene(new Scene(s.getView()));
         } catch(Exception e) { e.printStackTrace(); }
     }

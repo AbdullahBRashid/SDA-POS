@@ -30,6 +30,35 @@
 
     <right>
         <VBox spacing="10" style="-fx-border-color: #ccc; -fx-border-width: 0 0 0 1;">
+            <padding><Insets bottom="20" left="15" right="20" top="20" /></padding>
+
+            <Label styleClass="section-header" text="Product Details" />
+
+            <VBox spacing="5">
+                <Label text="Barcode / SKU" />
+                <TextField fx:id="barcodeField" promptText="Unique ID" />
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Name" />
+                <TextField fx:id="nameField" promptText="Product Name" />
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Selling Price" />
+                <TextField fx:id="priceField" promptText="0.00" />
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Initial Stock" />
+                <TextField fx:id="stockField" promptText="0" />
+            </VBox>
+
+            <Label fx:id="msgLabel" wrapText="true" />
+
+            <Button maxWidth="Infinity" onAction="#handleSaveProduct" styleClass="action-button" text="Save Product" />
+            <Button maxWidth="Infinity" onAction="#handleClear" styleClass="secondary-button" text="Clear Form" />
+
             <padding><Insets top="10" right="10" left="10" bottom="10"/></padding>
             <Label text="Stock Alerts" style="-fx-font-weight: bold; -fx-text-fill: red;"/>
             <ListView fx:id="notificationList" VBox.vgrow="ALWAYS"/>

@@ -2,6 +2,7 @@ package com.DullPointers.view;
 
 import com.DullPointers.controller.LoginController;
 import com.DullPointers.manager.AuthManager;
+import com.DullPointers.manager.LogManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import java.io.IOException;
@@ -9,10 +10,12 @@ import java.io.IOException;
 public class LoginScreen {
     private final AuthManager authManager;
     private final ViewNavigator navigator;
+    private final LogManager logManager;
 
-    public LoginScreen(AuthManager authManager, ViewNavigator navigator) {
+    public LoginScreen(LogManager logManager, AuthManager authManager, ViewNavigator navigator) {
         this.authManager = authManager;
         this.navigator = navigator;
+        this.logManager = logManager;
     }
 
     public Parent getView() throws IOException {
@@ -21,6 +24,7 @@ public class LoginScreen {
 
         LoginController controller = loader.getController();
         controller.setAuthManager(authManager);
+        controller.setLogManager(logManager);
 
         // Map the controller's simple navigator interface to our main ViewNavigator
         controller.setNavigator(new LoginController.ViewNavigator() {

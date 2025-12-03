@@ -8,7 +8,7 @@ import java.util.List;
 public class FileSaleRepository implements SaleRepository {
     // Change in .gitignore too if file name or path changes.
     private static final String FILE_PATH = "sales.json";
-    private List<Sale> database;
+    private final List<Sale> database;
 
     public FileSaleRepository() {
         this.database = JsonDataStore.load(FILE_PATH, Sale[].class);

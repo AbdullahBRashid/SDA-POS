@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 public class AuthManager {
+    // Singleton
     private final UserRepository userRepository;
     private final ShiftRepository shiftRepository;
     private User currentUser;
