@@ -173,6 +173,7 @@ public class ManagerController implements IManagerController {
     @FXML
     private void handleRefreshSales() {
         if(saleRepository != null) {
+            System.out.println( "SHOULD BE HERE:" + saleRepository.findAll());
             salesTable.setItems(FXCollections.observableArrayList(saleRepository.findAll()));
         }
     }

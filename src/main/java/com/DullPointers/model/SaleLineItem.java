@@ -1,5 +1,8 @@
 package com.DullPointers.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.math.BigDecimal;
 
 public class SaleLineItem implements ISaleLineItem {
@@ -36,7 +39,10 @@ public class SaleLineItem implements ISaleLineItem {
     }
 
     @Override
+    @JsonSerialize(as = Product.class)
+    @JsonDeserialize(as = Product.class)
     public IProduct getProduct() { return product; }
+
     @Override
     public int getQuantity() { return quantity; }
     @Override

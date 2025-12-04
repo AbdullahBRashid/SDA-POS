@@ -1,7 +1,12 @@
 package com.DullPointers.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.math.BigDecimal;
 
+//@JsonSerialize(as = Product.class)
+//@JsonDeserialize(as = Product.class)
 public interface IProduct {
     boolean hasSufficientStock(int requestedQuantity);
 

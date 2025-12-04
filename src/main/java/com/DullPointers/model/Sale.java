@@ -2,6 +2,9 @@ package com.DullPointers.model;
 
 import com.DullPointers.model.enums.SaleStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ public class Sale implements ISale {
     }
 
     @Override
+//    @JsonSerialize(as = SaleLineItem.class)
+//    @JsonDeserialize(as = SaleLineItem.class)
     public ISaleLineItem getProductLineItem(IProduct product) {
         for  (ISaleLineItem item : items) {
             if (item.getProduct() == product)
@@ -34,6 +39,8 @@ public class Sale implements ISale {
     }
 
     @Override
+    @JsonSerialize(as = User.class)
+    @JsonDeserialize(as = User.class)
     public IUser getCashier() {
         return cashier;
     }
@@ -95,8 +102,12 @@ public class Sale implements ISale {
 
     // Getters & Setters
     @Override
+    @JsonSerialize(contentAs = SaleLineItem.class)
+    @JsonDeserialize(contentAs = SaleLineItem.class)
     public List<ISaleLineItem> getItems() { return items; }
     @Override
+    @JsonSerialize(contentAs = Payment.class)
+    @JsonDeserialize(contentAs = Payment.class)
     public List<IPayment> getPayments() { return payments; }
     @Override
     public void setStatus(SaleStatus status) { this.status = status; }
@@ -105,6 +116,8 @@ public class Sale implements ISale {
     @Override
     public void setId(Long id) { this.id = id; }
     @Override
+    @JsonSerialize(as = Customer.class)
+    @JsonDeserialize(as = Customer.class)
     public ICustomer getCustomer() { return customer; }
     @Override
     public void setCustomer(ICustomer customer) { this.customer = customer; }

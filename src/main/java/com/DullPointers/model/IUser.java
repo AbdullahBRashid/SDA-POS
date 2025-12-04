@@ -1,7 +1,9 @@
 package com.DullPointers.model;
 
 import com.DullPointers.model.enums.Role;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+@JsonSerialize(as = User.class)
 public interface IUser {
     String getPasswordHash();
 

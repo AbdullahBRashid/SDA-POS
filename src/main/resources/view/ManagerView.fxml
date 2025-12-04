@@ -5,7 +5,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.DullPointers.controller.ManagerController"
-            stylesheets="@styles.css">
+            stylesheets="@../css/manager.css">
 
     <top>
         <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header-bar">
