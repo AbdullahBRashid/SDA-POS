@@ -1,15 +1,15 @@
 package com.DullPointers.util;
 
-import com.DullPointers.model.Customer;
-import com.DullPointers.model.Sale;
+import com.DullPointers.model.ICustomer;
+import com.DullPointers.model.ISale;
 import com.DullPointers.repository.SaleRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public class CustomerAnalytics {
-    public static String generateReport(Customer customer, SaleRepository saleRepo) {
-        List<Sale> history = saleRepo.findAll().stream()
+public interface CustomerAnalytics {
+    static String generateReport(ICustomer customer, SaleRepository saleRepo) {
+        List<ISale> history = saleRepo.findAll().stream()
                 .filter(s -> s.getCustomer() != null && s.getCustomer().getId().equals(customer.getId()))
                 .toList();
 
@@ -17,7 +17,7 @@ public class CustomerAnalytics {
 
         int totalVisits = history.size();
         BigDecimal totalSpent = BigDecimal.ZERO;
-        for (Sale s : history) {
+        for (ISale s : history) {
             totalSpent = totalSpent.add(s.calculateGrandTotal());
         }
 

@@ -55,10 +55,12 @@ bin/
 .DS_Store
 
 ### Database Files ###
+logs.json
 sales.json
 users.json
 products.json
 shifts.json
+logs.json
 customers.json
 
 

@@ -2,21 +2,24 @@ package com.DullPointers.model;
 
 import com.DullPointers.model.enums.SaleStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Sale {
+public class Sale implements ISale {
     private Long id; // Assuming you handle ID generation or use UUID string
     private LocalDateTime saleDate;
     private SaleStatus status;
-    private User cashier;
-    private List<SaleLineItem> items;
-    private List<Payment> payments;
+    private IUser cashier;
+    private List<ISaleLineItem> items;
+    private List<IPayment> payments;
 
     // NEW FIELDS
-    private Customer customer;
+    private ICustomer customer;
     private int pointsRedeemed;
 
     public Sale() {
@@ -24,7 +27,34 @@ public class Sale {
         this.payments = new ArrayList<>();
     }
 
-    public Sale(User cashier) {
+    @Override
+//    @JsonSerialize(as = SaleLineItem.class)
+//    @JsonDeserialize(as = SaleLineItem.class)
+    public ISaleLineItem getProductLineItem(IProduct product) {
+        for  (ISaleLineItem item : items) {
+            if (item.getProduct() == product)
+                return item;
+        }
+        return null;
+    }
+
+    @Override
+    @JsonSerialize(as = User.class)
+    @JsonDeserialize(as = User.class)
+    public IUser getCashier() {
+        return cashier;
+    }
+
+    @Override
+    public Integer getItemCount() {
+        int count = 0;
+        for (ISaleLineItem item : items) {
+            count += item.getQuantity();
+        }
+        return count;
+    }
+
+    public Sale(IUser cashier) {
         this();
         this.saleDate = LocalDateTime.now();
         this.status = SaleStatus.PENDING;
@@ -32,21 +62,24 @@ public class Sale {
         this.pointsRedeemed = 0;
     }
 
-    public void addItem(Product product, int quantity) {
+    @Override
+    public void addItem(IProduct product, int quantity) {
         items.add(new SaleLineItem(product, quantity));
     }
 
+    @Override
     public BigDecimal calculateGrandTotal() {
         BigDecimal total = BigDecimal.ZERO;
-        for (SaleLineItem item : items) {
+        for (ISaleLineItem item : items) {
             total = total.add(item.getSubTotal());
         }
         return total;
     }
 
+    @Override
     public BigDecimal calculateTotalPaid() {
         BigDecimal paid = BigDecimal.ZERO;
-        for (Payment p : payments) {
+        for (IPayment p : payments) {
             paid = paid.add(p.getAmount());
         }
         return paid;
@@ -54,6 +87,7 @@ public class Sale {
 
     // Logic: Total - Points Discount
     @JsonIgnore
+    @Override
     public BigDecimal getNetPayableAmount() {
         BigDecimal subtotal = calculateGrandTotal();
         BigDecimal discount = BigDecimal.valueOf(pointsRedeemed);
@@ -61,19 +95,36 @@ public class Sale {
         return net.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : net;
     }
 
+    @Override
     public boolean isFullyPaid() {
         return calculateTotalPaid().compareTo(getNetPayableAmount()) >= 0;
     }
 
     // Getters & Setters
-    public List<SaleLineItem> getItems() { return items; }
-    public List<Payment> getPayments() { return payments; }
+    @Override
+    @JsonSerialize(contentAs = SaleLineItem.class)
+    @JsonDeserialize(contentAs = SaleLineItem.class)
+    public List<ISaleLineItem> getItems() { return items; }
+    @Override
+    @JsonSerialize(contentAs = Payment.class)
+    @JsonDeserialize(contentAs = Payment.class)
+    public List<IPayment> getPayments() { return payments; }
+    @Override
     public void setStatus(SaleStatus status) { this.status = status; }
+    @Override
     public Long getId() { return id; }
+    @Override
     public void setId(Long id) { this.id = id; }
-    public Customer getCustomer() { return customer; }
-    public void setCustomer(Customer customer) { this.customer = customer; }
+    @Override
+    @JsonSerialize(as = Customer.class)
+    @JsonDeserialize(as = Customer.class)
+    public ICustomer getCustomer() { return customer; }
+    @Override
+    public void setCustomer(ICustomer customer) { this.customer = customer; }
+    @Override
     public int getPointsRedeemed() { return pointsRedeemed; }
+    @Override
     public void setPointsRedeemed(int pointsRedeemed) { this.pointsRedeemed = pointsRedeemed; }
+    @Override
     public LocalDateTime getSaleDate() { return saleDate; }
 }

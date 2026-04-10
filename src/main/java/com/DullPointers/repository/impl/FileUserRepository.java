@@ -1,5 +1,6 @@
 package com.DullPointers.repository.impl;
 
+import com.DullPointers.model.IUser;
 import com.DullPointers.model.User;
 import com.DullPointers.model.enums.Role;
 import com.DullPointers.repository.UserRepository;
@@ -13,7 +14,7 @@ import java.util.Optional;
 public class FileUserRepository implements UserRepository {
     // Change in .gitignore too if file name or path changes.
     private static final String FILE_PATH = "users.json";
-    private List<User> database;
+    private List<IUser> database;
 
     public FileUserRepository() {
         // 1. Load existing users
@@ -42,13 +43,13 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<IUser> findAll() {
         // Return a copy of the list to prevent external modification of the cache directly
         return new ArrayList<>(database);
     }
 
     @Override
-    public void save(User user) {
+    public void save(IUser user) {
         // Remove existing user with same username to handle updates
         database.removeIf(u -> u.getUsername().equals(user.getUsername()));
         database.add(user);
@@ -56,13 +57,13 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(User user) {
+    public void delete(IUser user) {
         database.removeIf(u -> u.getUsername().equals(user.getUsername()));
         saveToFile();
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
+    public Optional<IUser> findByUsername(String username) {
         return database.stream()
                 .filter(u -> u.getUsername().equals(username))
                 .findFirst();
